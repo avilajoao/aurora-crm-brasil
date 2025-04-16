@@ -1,4 +1,3 @@
-
 import {
   BarChart3,
   Building2,
@@ -12,7 +11,7 @@ import {
   Settings,
   ShoppingCart,
   Tag,
-  User,
+  UserPlus,
   Users
 } from 'lucide-react';
 
@@ -46,6 +45,14 @@ export function AppSidebar() {
                   <a href="/" className="bg-sidebar-accent dark:bg-sidebar-accent/50">
                     <LayoutDashboard />
                     <span>Dashboard</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/leads">
+                    <UserPlus />
+                    <span>Prospecção</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
