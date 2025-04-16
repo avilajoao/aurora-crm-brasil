@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Users, Phone, Mail, Briefcase, PlusCircle } from 'lucide-react';
+import { Search, Users, Phone, Mail, Briefcase, PlusCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +23,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Team, TeamMember, Project } from "@/types/teams";
+import { useAuth } from "@/contexts/AuthContext";
+import { PermissionGuard, PermissionButton } from "@/components/auth/PermissionGuard";
+import { NovaEquipe } from "@/components/equipes/NovaEquipe";
 
-// Dados de exemplo de projetos
 const projetosExemplo: Project[] = [
   {
     id: "1",
@@ -46,7 +48,6 @@ const projetosExemplo: Project[] = [
   }
 ];
 
-// Mantendo os dados de exemplo das equipes
 const equipesExemplo: Team[] = [
   {
     id: "1",
@@ -156,6 +157,7 @@ export function EquipesPage() {
   const [projetos, setProjetos] = useState<Project[]>(projetosExemplo);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const { hasPermission } = useAuth();
 
   const filteredEquipes = equipes.filter((equipe) =>
     equipe.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -164,6 +166,15 @@ export function EquipesPage() {
   );
 
   const alocarMembro = (membroId: string, projetoId: string, equipeId: string) => {
+    if (!hasPermission('edit_team_allocation')) {
+      toast({
+        title: "Acesso negado",
+        description: "Você não tem permissão para alocar membros em projetos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const projetoAtualizado = projetos.map(projeto => {
       if (projeto.id === projetoId) {
         const equipe = equipes.find(e => e.id === equipeId);
@@ -186,6 +197,10 @@ export function EquipesPage() {
       description: "Membro foi alocado ao projeto com sucesso.",
       variant: "default",
     });
+  };
+
+  const handleAddEquipe = (novaEquipe: Team) => {
+    setEquipes([...equipes, novaEquipe]);
   };
 
   const AlocacaoDialog = ({ membro, equipeId }: { membro: TeamMember; equipeId: string }) => (
@@ -248,7 +263,9 @@ export function EquipesPage() {
           )}
         </div>
       </div>
-      <AlocacaoDialog membro={membro} equipeId={equipeId} />
+      <PermissionGuard requiredPermission="edit_team_allocation">
+        <AlocacaoDialog membro={membro} equipeId={equipeId} />
+      </PermissionGuard>
     </div>
   );
 
@@ -260,9 +277,9 @@ export function EquipesPage() {
             <h1 className="text-3xl font-bold tracking-tight">Equipes</h1>
             <p className="text-muted-foreground">Gerencie as equipes da empresa</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Nova Equipe
-          </Button>
+          <PermissionGuard requiredPermission="edit_team_allocation">
+            <NovaEquipe onAddEquipe={handleAddEquipe} />
+          </PermissionGuard>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">

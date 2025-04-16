@@ -1,8 +1,7 @@
-
 // Definição de tipos para o Aurora CRM Brasil
 
 // Tipos de usuário
-export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'operador' | 'cliente';
+export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente';
 
 // Interface de usuário
 export interface User {
@@ -272,4 +271,20 @@ export interface Conversa {
   dataCriacao: Date;
   ultimaMensagem?: Mensagem;
   mensagens: Mensagem[];
+}
+
+// Enhanced user roles with permission levels
+export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente';
+
+// Permission structure for role-based access control
+export interface Permission {
+  id: string;
+  name: string;
+  description: string;
+  key: string;
+}
+
+// User with permissions
+export interface UserWithPermissions extends User {
+  permissions: string[]; // Array of permission keys
 }

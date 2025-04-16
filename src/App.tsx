@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
 import { Dashboard } from "./pages/Dashboard";
 import { ProjetosPage } from "./pages/ProjetosPage";
 import { ClientesPage } from "./pages/ClientesPage";
@@ -18,6 +19,7 @@ import { TarefasPage } from "./pages/TarefasPage";
 import { ChatPage } from "./pages/ChatPage";
 import { ConfiguracoesPage } from "./pages/ConfiguracoesPage";
 import { RelatoriosPage } from "./pages/RelatoriosPage";
+import { UsuariosPage } from "./pages/UsuariosPage";
 import NotFound from "./pages/NotFound";
 
 // Cria um novo cliente do React Query para gerenciamento de estado e cache
@@ -33,32 +35,35 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      {/* Componentes de toast para notificações ao usuário */}
-      <Toaster />
-      <Sonner />
-      {/* Configuração de rotas da aplicação */}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/leads" element={<LeadsPage />} />
-          <Route path="/clientes" element={<ClientesPage />} />
-          <Route path="/projetos" element={<ProjetosPage />} />
-          <Route path="/orcamentos" element={<OrcamentosPage />} />
-          <Route path="/compras" element={<ComprasPage />} />
-          <Route path="/compras/solicitacoes" element={<SolicitacoesCompraPage />} />
-          <Route path="/fornecedores" element={<FornecedoresPage />} />
-          <Route path="/equipes" element={<EquipesPage />} />
-          <Route path="/calendario" element={<CalendarioPage />} />
-          <Route path="/tarefas" element={<TarefasPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/configuracoes" element={<ConfiguracoesPage />} />
-          <Route path="/relatorios" element={<RelatoriosPage />} />
-          {/* Rota 404 para páginas não encontradas */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        {/* Componentes de toast para notificações ao usuário */}
+        <Toaster />
+        <Sonner />
+        {/* Configuração de rotas da aplicação */}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/leads" element={<LeadsPage />} />
+            <Route path="/clientes" element={<ClientesPage />} />
+            <Route path="/projetos" element={<ProjetosPage />} />
+            <Route path="/orcamentos" element={<OrcamentosPage />} />
+            <Route path="/compras" element={<ComprasPage />} />
+            <Route path="/compras/solicitacoes" element={<SolicitacoesCompraPage />} />
+            <Route path="/fornecedores" element={<FornecedoresPage />} />
+            <Route path="/equipes" element={<EquipesPage />} />
+            <Route path="/calendario" element={<CalendarioPage />} />
+            <Route path="/tarefas" element={<TarefasPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+            <Route path="/relatorios" element={<RelatoriosPage />} />
+            <Route path="/usuarios" element={<UsuariosPage />} />
+            {/* Rota 404 para páginas não encontradas */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

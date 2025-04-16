@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -15,8 +14,11 @@ import {
   Users, 
   Mail, 
   Smartphone,
-  Save
+  Save,
+  UserCog
 } from 'lucide-react';
+import { RoleSelector } from "@/components/auth/RoleSelector";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function ConfiguracoesPage() {
   const [notificacoesEmail, setNotificacoesEmail] = useState(true);
@@ -24,6 +26,7 @@ export function ConfiguracoesPage() {
   const [notificacoesMensagens, setNotificacoesMensagens] = useState(true);
   const [notificacoesTarefas, setNotificacoesTarefas] = useState(true);
   const [modoEscuro, setModoEscuro] = useState(false);
+  const { currentUser } = useAuth();
 
   return (
     <AppLayout>
@@ -34,12 +37,13 @@ export function ConfiguracoesPage() {
         </div>
 
         <Tabs defaultValue="perfil">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
             <TabsTrigger value="perfil">Perfil</TabsTrigger>
             <TabsTrigger value="empresa">Empresa</TabsTrigger>
             <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
             <TabsTrigger value="seguranca">Segurança</TabsTrigger>
             <TabsTrigger value="equipe">Equipe</TabsTrigger>
+            <TabsTrigger value="permissoes">Permissões</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -266,6 +270,64 @@ export function ConfiguracoesPage() {
                   </Button>
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="permissoes">
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <UserCog className="h-5 w-5" /> Simulação de Papéis
+                    </CardTitle>
+                    <CardDescription>
+                      Alterne entre diferentes papéis para testar as permissões
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <RoleSelector />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Shield className="h-5 w-5" /> Permissões Atuais
+                    </CardTitle>
+                    <CardDescription>
+                      Permissões associadas ao seu papel atual
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div>
+                      <div className="font-medium mb-2">Papel atual: {currentUser?.cargo}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <Card className="p-3 bg-primary/5">
+                          <div className="font-medium">Acesso às páginas</div>
+                          <ul className="text-sm mt-1 space-y-1">
+                            <li>✓ Dashboard</li>
+                            <li>✓ Equipes</li>
+                            <li>✓ Tarefas</li>
+                            <li>{currentUser?.cargo !== 'operador' ? '✓' : '✗'} Financeiro</li>
+                            <li>{currentUser?.cargo !== 'operador' && currentUser?.cargo !== 'cliente' ? '✓' : '✗'} Relatórios</li>
+                            <li>{currentUser?.cargo === 'admin' || currentUser?.cargo === 'gestor' || currentUser?.cargo === 'rh' ? '✓' : '✗'} Gerenciar Usuários</li>
+                          </ul>
+                        </Card>
+                        
+                        <Card className="p-3 bg-primary/5">
+                          <div className="font-medium">Ações permitidas</div>
+                          <ul className="text-sm mt-1 space-y-1">
+                            <li>✓ Ver equipes</li>
+                            <li>{currentUser?.cargo !== 'operador' && currentUser?.cargo !== 'cliente' ? '✓' : '✗'} Alocar membros</li>
+                            <li>{currentUser?.cargo !== 'operador' && currentUser?.cargo !== 'cliente' ? '✓' : '✗'} Aprovar solicitações</li>
+                            <li>{currentUser?.cargo !== 'operador' && currentUser?.cargo !== 'cliente' ? '✓' : '✗'} Ver valores financeiros</li>
+                            <li>{currentUser?.cargo === 'admin' || currentUser?.cargo === 'gestor' ? '✓' : '✗'} Editar valores financeiros</li>
+                          </ul>
+                        </Card>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </div>
         </Tabs>

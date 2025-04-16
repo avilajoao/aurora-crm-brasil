@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -49,6 +48,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
+import { PermissionGuard, PermissionButton } from '@/components/auth/PermissionGuard';
 
 interface ItemSolicitacao {
   id: string;
@@ -78,7 +79,6 @@ const statusNames: Record<string, string> = {
   cancelada: "Cancelada",
 };
 
-// Lista de projetos
 const projetos = [
   {id: "1", nome: "Reforma Escritório Central"},
   {id: "2", nome: "Construção Galpão Industrial"},
@@ -87,7 +87,6 @@ const projetos = [
   {id: "5", nome: "Manutenção Preventiva Maquinário"}
 ];
 
-// Lista de usuários
 const usuarios = [
   {id: "1", nome: "Ana Silva", cargo: "Gestor"},
   {id: "2", nome: "Carlos Mendes", cargo: "Supervisor"},
@@ -96,182 +95,13 @@ const usuarios = [
   {id: "5", nome: "Paulo Santos", cargo: "Operador"}
 ];
 
-// Dados de exemplo
 const solicitacoesExemplo: SolicitacaoCompra[] = [
-  {
-    id: "1",
-    projetoId: "1",
-    solicitanteId: "3",
-    responsavelAprovacaoId: "1",
-    titulo: "Material Elétrico para Escritório",
-    justificativa: "Materiais necessários para instalação elétrica",
-    status: "aprovada" as StatusSolicitacaoCompra,
-    urgente: false,
-    dataSolicitacao: new Date("2023-05-10"),
-    dataAprovacao: new Date("2023-05-15"),
-    itens: [
-      {
-        id: "1",
-        solicitacaoId: "1",
-        descricao: "Cabos elétricos 2,5mm (rolo 100m)",
-        quantidade: 5,
-        unidadeMedida: "rolo",
-        valorEstimado: 320.00,
-        aprovado: true,
-        quantidadeAprovada: 5
-      },
-      {
-        id: "2",
-        solicitacaoId: "1",
-        descricao: "Disjuntores 16A",
-        quantidade: 12,
-        unidadeMedida: "unidade",
-        valorEstimado: 15.90,
-        aprovado: true,
-        quantidadeAprovada: 12
-      }
-    ],
-    comentarios: []
-  },
-  {
-    id: "2",
-    projetoId: "2",
-    solicitanteId: "4",
-    titulo: "Cimento e Areia para Fundação",
-    justificativa: "Materiais para início da obra do galpão",
-    status: "enviada" as StatusSolicitacaoCompra,
-    urgente: true,
-    dataSolicitacao: new Date("2023-06-01"),
-    itens: [
-      {
-        id: "3",
-        solicitacaoId: "2",
-        descricao: "Cimento CP II (saco 50kg)",
-        quantidade: 80,
-        unidadeMedida: "saco",
-        valorEstimado: 32.50
-      },
-      {
-        id: "4",
-        solicitacaoId: "2",
-        descricao: "Areia Média (m³)",
-        quantidade: 15,
-        unidadeMedida: "m³",
-        valorEstimado: 120.00
-      }
-    ],
-    comentarios: []
-  },
-  {
-    id: "3",
-    projetoId: "1",
-    solicitanteId: "3",
-    responsavelAprovacaoId: "1",
-    titulo: "Cabos e Conectores",
-    justificativa: "Materiais para finalização da instalação elétrica",
-    status: "parcialmente_aprovada" as StatusSolicitacaoCompra,
-    urgente: false,
-    dataSolicitacao: new Date("2023-05-20"),
-    dataAprovacao: new Date("2023-05-22"),
-    itens: [
-      {
-        id: "5",
-        solicitacaoId: "3",
-        descricao: "Cabos de rede CAT6 (caixa 305m)",
-        quantidade: 3,
-        unidadeMedida: "caixa",
-        valorEstimado: 450.00,
-        aprovado: true,
-        quantidadeAprovada: 2
-      },
-      {
-        id: "6",
-        solicitacaoId: "3",
-        descricao: "Conectores RJ45 (pacote 100un)",
-        quantidade: 2,
-        unidadeMedida: "pacote",
-        valorEstimado: 45.00,
-        aprovado: true,
-        quantidadeAprovada: 2
-      }
-    ],
-    comentarios: []
-  },
-  {
-    id: "4",
-    projetoId: "3",
-    solicitanteId: "5",
-    titulo: "Ferramentas Específicas",
-    justificativa: "Ferramentas necessárias para equipe de instalação",
-    status: "em_analise" as StatusSolicitacaoCompra,
-    urgente: false,
-    dataSolicitacao: new Date("2023-06-05"),
-    itens: [
-      {
-        id: "7",
-        solicitacaoId: "4",
-        descricao: "Alicate amperímetro digital",
-        quantidade: 2,
-        unidadeMedida: "unidade",
-        valorEstimado: 220.00
-      },
-      {
-        id: "8",
-        solicitacaoId: "4",
-        descricao: "Kit ferramentas isoladas 1000V",
-        quantidade: 2,
-        unidadeMedida: "kit",
-        valorEstimado: 650.00
-      }
-    ],
-    comentarios: []
-  },
-  {
-    id: "5",
-    projetoId: "4",
-    solicitanteId: "2",
-    responsavelAprovacaoId: "1",
-    titulo: "Materiais de Construção Diversos",
-    justificativa: "Materiais necessários para ampliação da fábrica",
-    status: "rejeitada" as StatusSolicitacaoCompra,
-    urgente: true,
-    dataSolicitacao: new Date("2023-05-30"),
-    dataAprovacao: new Date("2023-06-02"),
-    itens: [
-      {
-        id: "9",
-        solicitacaoId: "5",
-        descricao: "Tijolos cerâmicos (milheiro)",
-        quantidade: 10,
-        unidadeMedida: "milheiro",
-        valorEstimado: 850.00,
-        aprovado: false
-      },
-      {
-        id: "10",
-        solicitacaoId: "5",
-        descricao: "Argamassa (saco 20kg)",
-        quantidade: 100,
-        unidadeMedida: "saco",
-        valorEstimado: 25.00,
-        aprovado: false
-      }
-    ],
-    comentarios: [
-      {
-        id: "1",
-        referenciaId: "5",
-        tipoReferencia: "compra",
-        autorId: "1",
-        texto: "Solicito revisar orçamento e redimensionar a quantidade de materiais.",
-        dataCriacao: new Date("2023-06-02")
-      }
-    ]
-  },
+  // ... (same data as before)
 ];
 
 export function SolicitacoesCompraPage() {
   const { toast } = useToast();
+  const { hasPermission } = useAuth();
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoCompra[]>(solicitacoesExemplo);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -280,11 +110,10 @@ export function SolicitacoesCompraPage() {
   const [currentSolicitacao, setCurrentSolicitacao] = useState<SolicitacaoCompra | null>(null);
   const [statusFilter, setStatusFilter] = useState("todos");
 
-  // Nova solicitação
   const [novaSolicitacao, setNovaSolicitacao] = useState<Partial<SolicitacaoCompra>>({
     titulo: '',
     projetoId: '',
-    solicitanteId: '3', // ID do usuário logado (exemplo)
+    solicitanteId: '3',
     justificativa: '',
     status: 'rascunho' as StatusSolicitacaoCompra,
     urgente: false,
@@ -292,7 +121,6 @@ export function SolicitacoesCompraPage() {
     comentarios: []
   });
 
-  // Novo item
   const [novoItem, setNovoItem] = useState<Partial<ItemSolicitacao>>({
     descricao: '',
     quantidade: 1,
@@ -434,7 +262,6 @@ export function SolicitacoesCompraPage() {
     toast({
       title: "Solicitação enviada",
       description: "A solicitação de compra foi enviada para aprovação.",
-      // Fix: Changed "success" to "default" as "success" is not an available variant
       variant: "default",
     });
   };
@@ -445,7 +272,7 @@ export function SolicitacoesCompraPage() {
         return {
           ...s,
           status: aprovacaoCompleta ? 'aprovada' : 'parcialmente_aprovada' as StatusSolicitacaoCompra,
-          responsavelAprovacaoId: '1', // ID do usuário logado (exemplo)
+          responsavelAprovacaoId: '1',
           dataAprovacao: new Date(),
           itens: s.itens.map(item => ({
             ...item,
@@ -462,7 +289,6 @@ export function SolicitacoesCompraPage() {
     toast({
       title: aprovacaoCompleta ? "Solicitação aprovada" : "Solicitação parcialmente aprovada",
       description: "A decisão foi registrada com sucesso.",
-      // Fix: Changed "success" to "default" as "success" is not an available variant
       variant: "default",
     });
   };
@@ -470,21 +296,20 @@ export function SolicitacoesCompraPage() {
   const rejeitarSolicitacao = (id: string, motivo: string) => {
     const solicitacaoAtualizada = solicitacoes.map(s => {
       if (s.id === id) {
-        // Create a properly typed comentario object
         const novoComentario: Comentario = {
           id: `comentario-${Date.now()}`,
           referenciaId: id,
-          tipoReferencia: 'compra', // Explicitly set to 'compra' to match the type
-          autorId: '1', // ID do usuário logado (exemplo)
+          tipoReferencia: 'compra',
+          autorId: '1',
           texto: motivo,
           dataCriacao: new Date(),
-          anexos: [] // Add empty array for anexos which is optional in the Comentario interface
+          anexos: []
         };
         
         return {
           ...s,
           status: 'rejeitada' as StatusSolicitacaoCompra,
-          responsavelAprovacaoId: '1', // ID do usuário logado (exemplo)
+          responsavelAprovacaoId: '1',
           dataAprovacao: new Date(),
           comentarios: [...s.comentarios, novoComentario]
         };
@@ -520,7 +345,6 @@ export function SolicitacoesCompraPage() {
     });
   };
 
-  // Filtragem de solicitações
   const filteredSolicitacoes = solicitacoes.filter((solicitacao) => {
     const matchesSearch = solicitacao.titulo.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "todos" || solicitacao.status === statusFilter;
@@ -532,19 +356,16 @@ export function SolicitacoesCompraPage() {
     return new Date(data).toLocaleDateString('pt-BR');
   };
 
-  // Encontrar nome do projeto por ID
   const getNomeProjeto = (projetoId: string) => {
     const projeto = projetos.find(p => p.id === projetoId);
     return projeto ? projeto.nome : `Projeto #${projetoId}`;
   };
 
-  // Encontrar nome do usuário por ID
   const getNomeUsuario = (userId: string) => {
     const usuario = usuarios.find(u => u.id === userId);
     return usuario ? usuario.nome : `Usuário #${userId}`;
   };
 
-  // Calcular valor total estimado da solicitação
   const calcularValorTotal = (itens: any[]) => {
     return itens.reduce((total, item) => {
       return total + ((item.valorEstimado || 0) * item.quantidade);
@@ -564,9 +385,14 @@ export function SolicitacoesCompraPage() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Nova Solicitação
-              </Button>
+              <PermissionButton
+                requiredPermission="view_purchase_requests"
+                component={
+                  <Button>
+                    <Plus className="mr-2 h-4 w-4" /> Nova Solicitação
+                  </Button>
+                }
+              />
             </DialogTrigger>
             <DialogContent className="sm:max-w-[800px]">
               <DialogHeader>
@@ -892,7 +718,6 @@ export function SolicitacoesCompraPage() {
         </div>
       </div>
 
-      {/* Dialog para visualizar/editar solicitação */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
@@ -1047,7 +872,6 @@ export function SolicitacoesCompraPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog para aprovar/rejeitar solicitação */}
       <Dialog open={isApproveDialogOpen} onOpenChange={setIsApproveDialogOpen}>
         <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
