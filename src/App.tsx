@@ -20,13 +20,24 @@ import { ConfiguracoesPage } from "./pages/ConfiguracoesPage";
 import { RelatoriosPage } from "./pages/RelatoriosPage";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Cria um novo cliente do React Query para gerenciamento de estado e cache
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      {/* Componentes de toast para notificações ao usuário */}
       <Toaster />
       <Sonner />
+      {/* Configuração de rotas da aplicação */}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
@@ -43,7 +54,7 @@ const App = () => (
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/configuracoes" element={<ConfiguracoesPage />} />
           <Route path="/relatorios" element={<RelatoriosPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Rota 404 para páginas não encontradas */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
