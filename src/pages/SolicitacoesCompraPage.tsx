@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { SolicitacaoCompra, StatusSolicitacaoCompra } from "@/types";
+import { Comentario, SolicitacaoCompra, StatusSolicitacaoCompra } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -434,7 +434,8 @@ export function SolicitacoesCompraPage() {
     toast({
       title: "Solicitação enviada",
       description: "A solicitação de compra foi enviada para aprovação.",
-      variant: "success",
+      // Fix: Changed "success" to "default" as "success" is not an available variant
+      variant: "default",
     });
   };
 
@@ -461,29 +462,31 @@ export function SolicitacoesCompraPage() {
     toast({
       title: aprovacaoCompleta ? "Solicitação aprovada" : "Solicitação parcialmente aprovada",
       description: "A decisão foi registrada com sucesso.",
-      variant: "success",
+      // Fix: Changed "success" to "default" as "success" is not an available variant
+      variant: "default",
     });
   };
 
   const rejeitarSolicitacao = (id: string, motivo: string) => {
     const solicitacaoAtualizada = solicitacoes.map(s => {
       if (s.id === id) {
+        // Create a properly typed comentario object
+        const novoComentario: Comentario = {
+          id: `comentario-${Date.now()}`,
+          referenciaId: id,
+          tipoReferencia: 'compra', // Explicitly set to 'compra' to match the type
+          autorId: '1', // ID do usuário logado (exemplo)
+          texto: motivo,
+          dataCriacao: new Date(),
+          anexos: [] // Add empty array for anexos which is optional in the Comentario interface
+        };
+        
         return {
           ...s,
           status: 'rejeitada' as StatusSolicitacaoCompra,
           responsavelAprovacaoId: '1', // ID do usuário logado (exemplo)
           dataAprovacao: new Date(),
-          comentarios: [
-            ...s.comentarios,
-            {
-              id: `comentario-${Date.now()}`,
-              referenciaId: id,
-              tipoReferencia: 'compra',
-              autorId: '1', // ID do usuário logado (exemplo)
-              texto: motivo,
-              dataCriacao: new Date()
-            }
-          ]
+          comentarios: [...s.comentarios, novoComentario]
         };
       }
       return s;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -187,7 +186,7 @@ export function LeadsPage() {
       toast({
         title: "Lead convertido em cliente",
         description: "O lead foi promovido para cliente com sucesso.",
-        variant: "success",
+        variant: "default",
       });
     } else {
       toast({
