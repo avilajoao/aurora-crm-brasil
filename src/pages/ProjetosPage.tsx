@@ -1,17 +1,8 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter, ArrowUpDown, Edit, Trash2, Calendar, Users, Building2 } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Search, Plus, Filter, Edit, Trash2, Calendar, Users, Building2, MoveHorizontal } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { StatusProjeto } from "@/types";
@@ -32,8 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 interface Projeto {
   id: string;
@@ -150,13 +141,8 @@ export function ProjetosPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentProjeto, setCurrentProjeto] = useState<Projeto | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   
-  // Ordenação
-  const [ordenacao, setOrdenacao] = useState<{campo: keyof Projeto, ordem: 'asc' | 'desc'}>({
-    campo: 'dataPrevista',
-    ordem: 'asc'
-  });
-
   // Filtros
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   
@@ -233,14 +219,6 @@ export function ProjetosPage() {
     });
   };
 
-  const ordenarProjetos = (campo: keyof Projeto) => {
-    const novaOrdem = ordenacao.campo === campo && ordenacao.ordem === 'asc' ? 'desc' : 'asc';
-    setOrdenacao({
-      campo,
-      ordem: novaOrdem
-    });
-  };
-
   // Filtragem de projetos
   const projetosFiltrados = projetos
     .filter((projeto) => {
@@ -250,24 +228,49 @@ export function ProjetosPage() {
       const matchesStatus = filtroStatus === "todos" || projeto.status === filtroStatus;
       
       return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      if (ordenacao.campo === 'valor') {
-        return ordenacao.ordem === 'asc' ? a.valor - b.valor : b.valor - a.valor;
-      } else if (ordenacao.campo === 'dataPrevista') {
-        const dataA = a.dataPrevista.split('/').reverse().join('-');
-        const dataB = b.dataPrevista.split('/').reverse().join('-');
-        return ordenacao.ordem === 'asc' 
-          ? dataA.localeCompare(dataB)
-          : dataB.localeCompare(dataA);
-      } else {
-        const valorA = a[ordenacao.campo]?.toString().toLowerCase() || '';
-        const valorB = b[ordenacao.campo]?.toString().toLowerCase() || '';
-        return ordenacao.ordem === 'asc' 
-          ? valorA.localeCompare(valorB)
-          : valorB.localeCompare(valorA);
-      }
     });
+
+  // Função para iniciar o arrastar
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("id", id);
+    setDraggingId(id);
+  };
+  
+  // Função para permitir soltar
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+  
+  // Função para finalizar a movimentação
+  const handleDrop = (e: React.DragEvent, status: StatusProjeto) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("id");
+    
+    // Atualiza o status do projeto arrastado
+    const projetosAtualizados = projetos.map(projeto => {
+      if (projeto.id === id) {
+        return { ...projeto, status };
+      }
+      return projeto;
+    });
+    
+    setProjetos(projetosAtualizados);
+    setDraggingId(null);
+    
+    toast({
+      title: "Status atualizado",
+      description: `Projeto movido para ${statusNames[status]}.`,
+    });
+  };
+
+  // Agrupamento dos projetos por status
+  const projetosPorStatus = (status: StatusProjeto) => {
+    return projetosFiltrados.filter(projeto => projeto.status === status);
+  };
+
+  // Lista de todos os status para exibir as colunas
+  const statusList: StatusProjeto[] = ["em_analise", "aguardando_aprovacao", "aprovado", "em_andamento", "em_pausa", "concluido", "cancelado"];
 
   return (
     <AppLayout>
@@ -292,7 +295,7 @@ export function ProjetosPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-1 gap-2">
-                  <Label htmlFor="titulo">Título do Projeto*</Label>
+                  <label htmlFor="titulo" className="text-sm font-medium">Título do Projeto*</label>
                   <Input
                     id="titulo"
                     value={novoProjeto.titulo}
@@ -301,7 +304,7 @@ export function ProjetosPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 gap-2">
-                  <Label htmlFor="cliente">Cliente*</Label>
+                  <label htmlFor="cliente" className="text-sm font-medium">Cliente*</label>
                   <Select
                     value={novoProjeto.cliente}
                     onValueChange={(value) => handleNovoProjetoChange('cliente', value)}
@@ -319,7 +322,7 @@ export function ProjetosPage() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="responsavel">Responsável</Label>
+                    <label htmlFor="responsavel" className="text-sm font-medium">Responsável</label>
                     <Select
                       value={novoProjeto.responsavel}
                       onValueChange={(value) => handleNovoProjetoChange('responsavel', value)}
@@ -336,7 +339,7 @@ export function ProjetosPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="data-prevista">Data Prevista*</Label>
+                    <label htmlFor="data-prevista" className="text-sm font-medium">Data Prevista*</label>
                     <Input
                       id="data-prevista"
                       type="text"
@@ -349,7 +352,7 @@ export function ProjetosPage() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="valor">Valor Orçado (R$)</Label>
+                    <label htmlFor="valor" className="text-sm font-medium">Valor Orçado (R$)</label>
                     <Input
                       id="valor"
                       type="number"
@@ -359,7 +362,7 @@ export function ProjetosPage() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="status">Status</Label>
+                    <label htmlFor="status" className="text-sm font-medium">Status</label>
                     <Select
                       value={novoProjeto.status}
                       onValueChange={(value: StatusProjeto) => handleNovoProjetoChange('status', value)}
@@ -381,7 +384,7 @@ export function ProjetosPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 gap-2">
-                  <Label htmlFor="descricao">Descrição</Label>
+                  <label htmlFor="descricao" className="text-sm font-medium">Descrição</label>
                   <Textarea
                     id="descricao"
                     placeholder="Detalhes do projeto"
@@ -424,98 +427,106 @@ export function ProjetosPage() {
                 <SelectItem value="cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
-            <Button 
-              variant="outline" 
-              className="flex gap-2"
-              onClick={() => ordenarProjetos('valor')}
-            >
-              <ArrowUpDown className="h-4 w-4" /> Ordenar por Valor
+            <Button variant="outline" className="flex gap-2">
+              <Filter className="h-4 w-4" /> Outros Filtros
             </Button>
           </div>
         </div>
 
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Projeto</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Responsável</TableHead>
-                <TableHead className="text-right">Valor</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Data Prevista</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {projetosFiltrados.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10">
-                    <div className="flex flex-col items-center justify-center">
-                      <ClipboardList className="h-10 w-10 text-muted-foreground mb-2" />
-                      <h3 className="font-medium">Nenhum projeto encontrado</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Não há projetos que correspondam aos critérios de busca.
-                      </p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                projetosFiltrados.map((projeto) => (
-                  <TableRow key={projeto.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">{projeto.titulo}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                        {projeto.cliente}
+        {/* Layout de quadros - modelo Kanban */}
+        <div className="flex gap-4 overflow-x-auto pb-6">
+          {statusList.map((status) => (
+            <div 
+              key={status}
+              className="flex-shrink-0 w-80 flex flex-col"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, status)}
+            >
+              <div className="mb-3 sticky top-0 bg-background z-10">
+                <div className="flex items-center justify-between border rounded-md p-3">
+                  <Badge className={cn("font-normal text-sm", statusColors[status])}>
+                    {statusNames[status]}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {projetosPorStatus(status).length} projeto(s)
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {projetosPorStatus(status).map((projeto) => (
+                  <Card 
+                    key={projeto.id}
+                    className={cn(
+                      "cursor-move shadow-sm hover:shadow-md transition-all",
+                      draggingId === projeto.id ? "opacity-50" : "opacity-100"
+                    )}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, projeto.id)}
+                    onDragEnd={() => setDraggingId(null)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-base">{projeto.titulo}</h3>
+                        <MoveHorizontal className="h-4 w-4 text-muted-foreground opacity-50" />
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        {projeto.responsavel}
+                      <div className="text-sm text-muted-foreground mb-2">
+                        <div className="flex items-center gap-1">
+                          <Building2 className="h-3.5 w-3.5" />
+                          <span>{projeto.cliente}</span>
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(projeto.valor)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={cn("font-normal", statusColors[projeto.status])}>
-                        {statusNames[projeto.status]}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {projeto.dataPrevista}
+                      <div className="flex items-center gap-3 mt-3 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>{projeto.responsavel}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>{projeto.dataPrevista}</span>
+                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => {
-                            setCurrentProjeto(projeto);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => excluirProjeto(projeto.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                      <div className="mt-3">
+                        <div className="font-medium text-sm">
+                          {new Intl.NumberFormat('pt-BR', { 
+                            style: 'currency', 
+                            currency: 'BRL' 
+                          }).format(projeto.valor)}
+                        </div>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                    </CardContent>
+                    <CardFooter className="px-4 py-2 flex justify-end gap-2 border-t">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentProjeto(projeto);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          excluirProjeto(projeto.id);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+                {projetosPorStatus(status).length === 0 && (
+                  <div className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <p className="text-sm">Sem projetos neste status</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -531,7 +542,7 @@ export function ProjetosPage() {
           {currentProjeto && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="edit-titulo">Título do Projeto</Label>
+                <label htmlFor="edit-titulo" className="text-sm font-medium">Título do Projeto</label>
                 <Input
                   id="edit-titulo"
                   value={currentProjeto.titulo}
@@ -540,7 +551,7 @@ export function ProjetosPage() {
               </div>
               
               <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="edit-cliente">Cliente</Label>
+                <label htmlFor="edit-cliente" className="text-sm font-medium">Cliente</label>
                 <Select
                   value={currentProjeto.cliente}
                   onValueChange={(value) => setCurrentProjeto({...currentProjeto, cliente: value})}
@@ -558,7 +569,7 @@ export function ProjetosPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-responsavel">Responsável</Label>
+                  <label htmlFor="edit-responsavel" className="text-sm font-medium">Responsável</label>
                   <Select
                     value={currentProjeto.responsavel}
                     onValueChange={(value) => setCurrentProjeto({...currentProjeto, responsavel: value})}
@@ -575,7 +586,7 @@ export function ProjetosPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-data-prevista">Data Prevista</Label>
+                  <label htmlFor="edit-data-prevista" className="text-sm font-medium">Data Prevista</label>
                   <Input
                     id="edit-data-prevista"
                     type="text"
@@ -588,7 +599,7 @@ export function ProjetosPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-valor">Valor Orçado (R$)</Label>
+                  <label htmlFor="edit-valor" className="text-sm font-medium">Valor Orçado (R$)</label>
                   <Input
                     id="edit-valor"
                     type="number"
@@ -598,7 +609,7 @@ export function ProjetosPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-status">Status</Label>
+                  <label htmlFor="edit-status" className="text-sm font-medium">Status</label>
                   <Select
                     value={currentProjeto.status}
                     onValueChange={(value: StatusProjeto) => setCurrentProjeto({...currentProjeto, status: value})}
@@ -620,7 +631,7 @@ export function ProjetosPage() {
               </div>
               
               <div className="grid grid-cols-1 gap-2">
-                <Label htmlFor="edit-descricao">Descrição</Label>
+                <label htmlFor="edit-descricao" className="text-sm font-medium">Descrição</label>
                 <Textarea
                   id="edit-descricao"
                   placeholder="Detalhes do projeto"
@@ -638,30 +649,5 @@ export function ProjetosPage() {
       </Dialog>
 
     </AppLayout>
-  );
-}
-
-// Component to render ClipboardList icon as a fallback
-function ClipboardList(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <path d="M12 11h4" />
-      <path d="M12 16h4" />
-      <path d="M8 11h.01" />
-      <path d="M8 16h.01" />
-    </svg>
   );
 }

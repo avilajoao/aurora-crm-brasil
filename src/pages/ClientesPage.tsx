@@ -3,17 +3,10 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter, ArrowUpDown, Building2, Phone, Mail } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Search, Plus, Filter, Building2, Phone, Mail, Calendar, User, MapPin } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 
 // Dados de exemplo
 const clientesExemplo = [
@@ -29,6 +22,7 @@ const clientesExemplo = [
     representante: "Marcos Oliveira",
     dataCadastro: new Date("2022-03-10"),
     ultimoContato: new Date("2023-05-15"),
+    categoria: "empresa",
   },
   {
     id: "2",
@@ -42,6 +36,7 @@ const clientesExemplo = [
     representante: "Carolina Mendes",
     dataCadastro: new Date("2021-11-05"),
     ultimoContato: new Date("2023-06-01"),
+    categoria: "empresa",
   },
   {
     id: "3",
@@ -55,6 +50,7 @@ const clientesExemplo = [
     representante: "Roberto Almeida",
     dataCadastro: new Date("2022-07-20"),
     ultimoContato: new Date("2023-04-12"),
+    categoria: "condominio",
   },
   {
     id: "4",
@@ -68,6 +64,7 @@ const clientesExemplo = [
     representante: "Luciana Ferreira",
     dataCadastro: new Date("2022-01-15"),
     ultimoContato: new Date("2023-05-30"),
+    categoria: "empresa",
   },
   {
     id: "5",
@@ -81,19 +78,33 @@ const clientesExemplo = [
     representante: "Fernando Santos",
     dataCadastro: new Date("2021-09-30"),
     ultimoContato: new Date("2023-04-28"),
+    categoria: "empresa",
   },
 ];
+
+// Categorias de clientes
+const categorias = {
+  "empresa": { label: "Empresa", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300" },
+  "condominio": { label: "Condomínio", color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" },
+  "pessoa_fisica": { label: "Pessoa Física", color: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300" },
+  "orgao_publico": { label: "Órgão Público", color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300" },
+};
 
 export function ClientesPage() {
   const [clientes] = useState(clientesExemplo);
   const [searchTerm, setSearchTerm] = useState("");
-  const [visualizacao, setVisualizacao] = useState<'lista' | 'cards'>('lista');
+  const [filtroCategoria, setFiltroCategoria] = useState<string | null>(null);
 
-  const filteredClientes = clientes.filter((cliente) =>
-    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.empresa?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClientes = clientes.filter((cliente) => {
+    const matchesSearch = 
+      cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.empresa?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategoria = !filtroCategoria || cliente.categoria === filtroCategoria;
+    
+    return matchesSearch && matchesCategoria;
+  });
 
   const formatarData = (data: Date) => {
     return new Date(data).toLocaleDateString('pt-BR');
@@ -122,88 +133,97 @@ export function ClientesPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto flex-wrap">
             <Button 
-              variant={visualizacao === 'lista' ? 'default' : 'outline'} 
-              onClick={() => setVisualizacao('lista')}
+              variant={filtroCategoria === null ? 'default' : 'outline'} 
+              onClick={() => setFiltroCategoria(null)}
+              className="text-xs h-8"
             >
-              Lista
+              Todos
             </Button>
-            <Button 
-              variant={visualizacao === 'cards' ? 'default' : 'outline'}
-              onClick={() => setVisualizacao('cards')}
-            >
-              Cards
-            </Button>
+            {Object.entries(categorias).map(([key, { label }]) => (
+              <Button 
+                key={key}
+                variant={filtroCategoria === key ? 'default' : 'outline'}
+                onClick={() => setFiltroCategoria(key)}
+                className="text-xs h-8"
+              >
+                {label}
+              </Button>
+            ))}
             <Button variant="outline" className="flex gap-2">
-              <Filter className="h-4 w-4" /> Filtrar
+              <Filter className="h-4 w-4" /> Mais Filtros
             </Button>
           </div>
         </div>
 
-        {visualizacao === 'lista' ? (
-          <div className="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Cidade/UF</TableHead>
-                  <TableHead>Data Cadastro</TableHead>
-                  <TableHead>Último Contato</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClientes.map((cliente) => (
-                  <TableRow key={cliente.id} className="cursor-pointer hover:bg-muted/50">
-                    <TableCell className="font-medium">{cliente.nome}</TableCell>
-                    <TableCell>{cliente.email}</TableCell>
-                    <TableCell>{cliente.telefone}</TableCell>
-                    <TableCell>{cliente.cidade}/{cliente.estado}</TableCell>
-                    <TableCell>{formatarData(cliente.dataCadastro)}</TableCell>
-                    <TableCell>{cliente.ultimoContato ? formatarData(cliente.ultimoContato) : '-'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredClientes.map((cliente) => (
-              <Card key={cliente.id} className="p-4 cursor-pointer hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {cliente.nome.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{cliente.nome}</h3>
-                    <p className="text-sm text-muted-foreground">{cliente.representante}</p>
+        {/* Cards de clientes organizados em grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredClientes.map((cliente) => (
+            <Card key={cliente.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <div className="border-b p-4 flex items-center gap-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {cliente.nome.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h3 className="font-medium">{cliente.nome}</h3>
+                  <div className="flex items-center gap-2">
+                    <Badge className={cliente.categoria ? categorias[cliente.categoria as keyof typeof categorias].color : ""}>
+                      {cliente.categoria ? categorias[cliente.categoria as keyof typeof categorias].label : "Outro"}
+                    </Badge>
                   </div>
                 </div>
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span>{cliente.cnpj}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{cliente.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{cliente.telefone}</span>
-                  </div>
+              </div>
+              
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{cliente.cnpj}</span>
                 </div>
-                <div className="mt-4 text-xs text-muted-foreground">
-                  Último contato: {cliente.ultimoContato ? formatarData(cliente.ultimoContato) : 'Não registrado'}
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{cliente.email}</span>
                 </div>
-              </Card>
-            ))}
-          </div>
-        )}
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span>{cliente.telefone}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{cliente.cidade}/{cliente.estado}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="truncate">{cliente.representante}</span>
+                </div>
+              </div>
+              
+              <div className="border-t p-3 bg-muted/20 flex justify-between items-center text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  <span>Cadastro: {formatarData(cliente.dataCadastro)}</span>
+                </div>
+                <div>
+                  Contato: {cliente.ultimoContato ? formatarData(cliente.ultimoContato) : 'Não registrado'}
+                </div>
+              </div>
+            </Card>
+          ))}
+          
+          {filteredClientes.length === 0 && (
+            <div className="col-span-full p-8 text-center">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Building2 className="h-10 w-10 text-muted-foreground" />
+                <h3 className="font-medium">Nenhum cliente encontrado</h3>
+                <p className="text-muted-foreground text-sm max-w-md">
+                  Não foram encontrados clientes com os filtros selecionados. Tente ajustar sua busca ou adicione novos clientes.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AppLayout>
   );

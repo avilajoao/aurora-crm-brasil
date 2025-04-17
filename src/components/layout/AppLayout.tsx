@@ -4,9 +4,9 @@ import { AppSidebar } from './AppSidebar';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Bell, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useIsMobile } from '@/hooks/use-mobile'; // Changed from useMobile to useIsMobile
+import { useIsMobile } from '@/hooks/use-mobile';
 import { NotificacoesDialog } from './NotificacoesDialog';
 
 interface AppLayoutProps {
@@ -14,7 +14,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { isMobile } = useIsMobile(); // Destructure directly from useIsMobile
+  const { isMobile } = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const { currentUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+      <AppSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
       <div className="flex flex-col flex-1">
         <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background px-4 h-14">
           <Button

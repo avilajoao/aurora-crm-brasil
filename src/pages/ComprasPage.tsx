@@ -3,15 +3,7 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter, Edit } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Search, Plus, Filter, Edit, MoveHorizontal, FileText, Building2, User, Calendar } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { StatusCompra, Compra } from "@/types";
@@ -20,7 +12,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -32,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { PermissionGuard, PermissionButton } from "@/components/auth/PermissionGuard";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 const statusColors: Record<string, string> = {
   pendente: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
@@ -116,6 +108,7 @@ export function ComprasPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCompra, setSelectedCompra] = useState<Compra | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const filteredCompras = compras.filter((compra) =>
@@ -144,6 +137,50 @@ export function ComprasPage() {
       });
     }
   };
+
+  // Função para iniciar o arrastar
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("id", id);
+    setDraggingId(id);
+  };
+  
+  // Função para permitir soltar
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+  
+  // Função para finalizar a movimentação
+  const handleDrop = (e: React.DragEvent, status: StatusCompra) => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData("id");
+    
+    if (!id) return;
+    
+    // Atualiza o status da compra arrastada
+    const comprasAtualizadas = compras.map(compra => {
+      if (compra.id === id) {
+        return { ...compra, status };
+      }
+      return compra;
+    });
+    
+    setCompras(comprasAtualizadas);
+    setDraggingId(null);
+    
+    toast({
+      title: "Status atualizado",
+      description: `Compra #${id} movida para ${statusNames[status]}.`,
+    });
+  };
+
+  // Agrupamento das compras por status
+  const comprasPorStatus = (status: StatusCompra) => {
+    return filteredCompras.filter(compra => compra.status === status);
+  };
+
+  // Lista de todos os status para exibir as colunas
+  const statusList: StatusCompra[] = ["pendente", "parcialmente_recebida", "recebida", "cancelada"];
 
   return (
     <AppLayout>
@@ -180,58 +217,94 @@ export function ComprasPage() {
           </div>
         </div>
 
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Projeto</TableHead>
-                <TableHead>Nota Fiscal</TableHead>
-                <TableHead>Data da Compra</TableHead>
-                <TableHead>Valor Total</TableHead>
-                <TableHead>Status</TableHead>
-                <PermissionGuard requiredPermission="change_purchase_status">
-                  <TableHead className="w-24">Ações</TableHead>
-                </PermissionGuard>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCompras.map((compra) => (
-                <TableRow key={compra.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{compra.id}</TableCell>
-                  <TableCell>Projeto #{compra.projetoId}</TableCell>
-                  <TableCell>{compra.numeroNotaFiscal || '-'}</TableCell>
-                  <TableCell>{formatarData(compra.dataCompra)}</TableCell>
-                  <PermissionGuard
-                    requiredPermission="view_purchase_values"
-                    fallback={<TableCell>Restrito</TableCell>}
+        {/* Layout de quadros para compras */}
+        <div className="flex gap-4 overflow-x-auto pb-6">
+          {statusList.map((status) => (
+            <div 
+              key={status}
+              className="flex-shrink-0 w-80 flex flex-col"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, status)}
+            >
+              <div className="mb-3 sticky top-0 bg-background z-10">
+                <div className="flex items-center justify-between border rounded-md p-3">
+                  <Badge className={cn("font-normal text-sm", statusColors[status])}>
+                    {statusNames[status]}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {comprasPorStatus(status).length} compra(s)
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {comprasPorStatus(status).map((compra) => (
+                  <Card 
+                    key={compra.id}
+                    className={cn(
+                      "cursor-move shadow-sm hover:shadow-md transition-all",
+                      draggingId === compra.id ? "opacity-50" : "opacity-100"
+                    )}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, compra.id)}
+                    onDragEnd={() => setDraggingId(null)}
                   >
-                    <TableCell>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(compra.valorTotal)}</TableCell>
-                  </PermissionGuard>
-                  <TableCell>
-                    <Badge className={cn("font-normal", statusColors[compra.status])}>
-                      {statusNames[compra.status]}
-                    </Badge>
-                  </TableCell>
-                  <PermissionGuard requiredPermission="change_purchase_status">
-                    <TableCell>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedCompra(compra);
-                          setIsStatusDialogOpen(true);
-                        }}
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-base">Compra #{compra.id}</h3>
+                        <MoveHorizontal className="h-4 w-4 text-muted-foreground opacity-50" />
+                      </div>
+                      <div className="space-y-1.5 my-2">
+                        <div className="flex items-center gap-1 text-sm">
+                          <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>NF: {compra.numeroNotaFiscal || "Pendente"}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>Projeto #{compra.projetoId}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <User className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>Responsável #{compra.responsavelId}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>{formatarData(compra.dataCompra)}</span>
+                        </div>
+                      </div>
+                      <PermissionGuard
+                        requiredPermission="view_purchase_values"
+                        fallback={<div className="mt-3 text-sm text-muted-foreground">Valor: Restrito</div>}
                       >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </PermissionGuard>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                        <div className="mt-3 font-medium">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(compra.valorTotal)}
+                        </div>
+                      </PermissionGuard>
+                    </CardContent>
+                    <CardFooter className="px-4 py-2 flex justify-end gap-2 border-t">
+                      <PermissionGuard requiredPermission="change_purchase_status">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedCompra(compra);
+                            setIsStatusDialogOpen(true);
+                          }}
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                        </Button>
+                      </PermissionGuard>
+                    </CardFooter>
+                  </Card>
+                ))}
+                {comprasPorStatus(status).length === 0 && (
+                  <div className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <p className="text-sm">Sem compras neste status</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
 
         <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>

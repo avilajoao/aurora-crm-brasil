@@ -13,7 +13,8 @@ import {
   Clock, 
   AlertCircle, 
   User,
-  Calendar
+  Calendar,
+  MoveHorizontal
 } from 'lucide-react';
 import {
   Card,
@@ -24,6 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StatusTarefa, PrioridadeTarefa } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 // Status das tarefas
 const statusTarefas = {
@@ -150,9 +152,11 @@ const tarefasExemplo = [
 interface ColunaTarefasProps {
   status: StatusTarefa;
   tarefas: typeof tarefasExemplo;
+  onDrop: (e: React.DragEvent, status: StatusTarefa) => void;
+  onDragOver: (e: React.DragEvent) => void;
 }
 
-function ColunaTarefas({ status, tarefas }: ColunaTarefasProps) {
+function ColunaTarefas({ status, tarefas, onDrop, onDragOver }: ColunaTarefasProps) {
   const tarefasFiltradas = tarefas.filter(tarefa => tarefa.status === status);
   const statusConfig = statusTarefas[status];
 
@@ -172,7 +176,11 @@ function ColunaTarefas({ status, tarefas }: ColunaTarefasProps) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div 
+      className="flex flex-col h-full"
+      onDrop={(e) => onDrop(e, status)}
+      onDragOver={onDragOver}
+    >
       <div className="flex items-center gap-2 mb-3 px-2">
         {getIconeStatus(status)}
         <h3 className="font-medium">{statusConfig.label}</h3>
@@ -182,9 +190,20 @@ function ColunaTarefas({ status, tarefas }: ColunaTarefasProps) {
       <ScrollArea className="flex-1 pr-2">
         <div className="space-y-3">
           {tarefasFiltradas.map((tarefa) => (
-            <Card key={tarefa.id} className="cursor-pointer hover:shadow-md transition-shadow">
+            <Card 
+              key={tarefa.id} 
+              className="cursor-move hover:shadow-md transition-shadow"
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("tarefaId", tarefa.id);
+                e.dataTransfer.effectAllowed = "move";
+              }}
+            >
               <CardContent className="p-3">
-                <h4 className="font-medium">{tarefa.titulo}</h4>
+                <div className="flex justify-between items-start">
+                  <h4 className="font-medium">{tarefa.titulo}</h4>
+                  <MoveHorizontal className="h-4 w-4 text-muted-foreground opacity-50" />
+                </div>
                 {tarefa.descricao && <p className="text-sm text-muted-foreground mt-1">{tarefa.descricao}</p>}
                 
                 <div className="mt-3 flex justify-between items-center">
@@ -207,6 +226,12 @@ function ColunaTarefas({ status, tarefas }: ColunaTarefasProps) {
               </CardContent>
             </Card>
           ))}
+          
+          {tarefasFiltradas.length === 0 && (
+            <div className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center text-center text-muted-foreground">
+              <p className="text-sm">Nenhuma tarefa</p>
+            </div>
+          )}
         </div>
       </ScrollArea>
     </div>
@@ -214,14 +239,61 @@ function ColunaTarefas({ status, tarefas }: ColunaTarefasProps) {
 }
 
 export function TarefasPage() {
-  const [tarefas] = useState(tarefasExemplo);
+  const [tarefas, setTarefas] = useState(tarefasExemplo);
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
 
   const filteredTarefas = searchTerm ? 
     tarefas.filter((tarefa) =>
       tarefa.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tarefa.descricao?.toLowerCase().includes(searchTerm.toLowerCase())
     ) : tarefas;
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, novoStatus: StatusTarefa) => {
+    e.preventDefault();
+    const tarefaId = e.dataTransfer.getData("tarefaId");
+    
+    if (!tarefaId) return;
+    
+    const tarefasAtualizadas = tarefas.map(tarefa => {
+      if (tarefa.id === tarefaId && tarefa.status !== novoStatus) {
+        const novaTarefa = { ...tarefa, status: novoStatus };
+        
+        // Se a tarefa estiver sendo marcada como concluída, adiciona a data de conclusão
+        if (novoStatus === "concluida" && !tarefa.dataConclusao) {
+          novaTarefa.dataConclusao = new Date();
+        }
+        
+        // Se a tarefa estiver sendo movida de concluída para outro status, remove a data de conclusão
+        if (tarefa.status === "concluida" && novoStatus !== "concluida") {
+          novaTarefa.dataConclusao = undefined;
+        }
+        
+        // Se a tarefa estiver sendo iniciada, adiciona a data de início
+        if ((novoStatus === "em_andamento" || novoStatus === "em_revisao") && !tarefa.dataInicio) {
+          novaTarefa.dataInicio = new Date();
+        }
+        
+        toast({
+          title: "Tarefa atualizada",
+          description: `A tarefa "${tarefa.titulo}" foi movida para ${statusTarefas[novoStatus].label}`,
+          variant: "default"
+        });
+        
+        return novaTarefa;
+      }
+      return tarefa;
+    });
+    
+    setTarefas(tarefasAtualizadas);
+  };
+
+  const statusList: StatusTarefa[] = ["pendente", "em_andamento", "em_revisao", "concluida", "bloqueada"];
 
   return (
     <AppLayout>
@@ -256,22 +328,18 @@ export function TarefasPage() {
           </div>
         </div>
 
+        {/* Layout de quadros para tarefas */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[calc(100vh-16rem)]">
-          <div className="border rounded-md p-4">
-            <ColunaTarefas status="pendente" tarefas={filteredTarefas} />
-          </div>
-          <div className="border rounded-md p-4">
-            <ColunaTarefas status="em_andamento" tarefas={filteredTarefas} />
-          </div>
-          <div className="border rounded-md p-4">
-            <ColunaTarefas status="em_revisao" tarefas={filteredTarefas} />
-          </div>
-          <div className="border rounded-md p-4">
-            <ColunaTarefas status="concluida" tarefas={filteredTarefas} />
-          </div>
-          <div className="border rounded-md p-4">
-            <ColunaTarefas status="bloqueada" tarefas={filteredTarefas} />
-          </div>
+          {statusList.map((status) => (
+            <div key={status} className="border rounded-md p-4">
+              <ColunaTarefas 
+                status={status} 
+                tarefas={filteredTarefas} 
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </AppLayout>
