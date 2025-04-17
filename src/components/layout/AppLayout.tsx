@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Bell, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile'; // Changed from useMobile to useIsMobile
 import { NotificacoesDialog } from './NotificacoesDialog';
 
 interface AppLayoutProps {
@@ -14,7 +14,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const { isMobile } = useMobile();
+  const { isMobile } = useIsMobile(); // Destructure directly from useIsMobile
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const { currentUser, isAuthenticated } = useAuth();
   const navigate = useNavigate();
