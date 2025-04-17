@@ -1,4 +1,3 @@
-
 // Definição de tipos para o Aurora CRM Brasil
 
 // Tipos de usuário
@@ -37,13 +36,13 @@ export interface Cliente {
 
 // Status de projeto
 export type StatusProjeto = 
-  | 'em_analise'
-  | 'aguardando_aprovacao'
-  | 'aprovado'
-  | 'em_andamento'
-  | 'em_pausa'
-  | 'concluido'
-  | 'cancelado';
+  | "em_analise" 
+  | "aguardando_aprovacao" 
+  | "aprovado" 
+  | "em_andamento" 
+  | "em_pausa" 
+  | "concluido" 
+  | "cancelado";
 
 // Interface de projeto
 export interface Projeto {
@@ -77,14 +76,18 @@ export interface Etapa {
 
 // Status de tarefa
 export type StatusTarefa = 
-  | 'pendente'
-  | 'em_andamento' 
-  | 'em_revisao' 
-  | 'concluida' 
-  | 'bloqueada';
+  | "pendente" 
+  | "em_andamento" 
+  | "em_revisao" 
+  | "concluida" 
+  | "bloqueada";
 
 // Prioridade de tarefa
-export type PrioridadeTarefa = 'baixa' | 'media' | 'alta' | 'urgente';
+export type PrioridadeTarefa =
+  | "baixa"
+  | "media"
+  | "alta"
+  | "urgente";
 
 // Interface de tarefa
 export interface Tarefa {
@@ -106,7 +109,7 @@ export interface Tarefa {
 export interface Comentario {
   id: string;
   referenciaId: string; // ID da tarefa, projeto, orçamento, etc.
-  tipoReferencia: 'tarefa' | 'projeto' | 'orcamento' | 'compra';
+  tipoReferencia: "tarefa" | "projeto" | "orcamento" | "compra";
   autorId: string;
   texto: string;
   dataCriacao: Date;
@@ -125,30 +128,29 @@ export interface Anexo {
 
 // Status de orçamento
 export type StatusOrcamento = 
-  | 'rascunho'
-  | 'enviado_ao_cliente'
-  | 'em_revisao'
-  | 'aprovado_pelo_cliente' 
-  | 'rejeitado_pelo_cliente'
-  | 'aguardando_modificacoes'
-  | 'cancelado';
+  | "rascunho"
+  | "enviado_ao_cliente"
+  | "em_revisao"
+  | "aprovado_pelo_cliente" 
+  | "rejeitado_pelo_cliente"
+  | "aguardando_modificacoes"
+  | "cancelado";
 
 // Interface de orçamento
 export interface Orcamento {
   id: string;
-  projetoId?: string;
   clienteId: string;
   titulo: string;
   descricao?: string;
-  status: StatusOrcamento;
+  status: keyof StatusOrcamento;
   valorTotal: number;
   responsavelId: string;
   dataCriacao: Date;
   dataEnvio?: Date;
   dataAprovacao?: Date;
   dataValidade?: Date;
-  itens: ItemOrcamento[];
-  comentarios: Comentario[];
+  itens: any[]; // Pode ser substituído por um tipo mais específico
+  comentarios: any[]; // Pode ser substituído por um tipo mais específico
 }
 
 // Interface de item de orçamento
@@ -164,18 +166,17 @@ export interface ItemOrcamento {
 
 // Status de solicitação de compra
 export type StatusSolicitacaoCompra = 
-  | 'rascunho'
-  | 'enviada'
-  | 'em_analise'
-  | 'aprovada'
-  | 'parcialmente_aprovada'
-  | 'rejeitada'
-  | 'cancelada';
+  | "rascunho"
+  | "enviada"
+  | "em_analise"
+  | "aprovada"
+  | "parcialmente_aprovada"
+  | "rejeitada"
+  | "cancelada";
 
 // Interface de solicitação de compra
 export interface SolicitacaoCompra {
   id: string;
-  projetoId?: string;
   solicitanteId: string;
   responsavelAprovacaoId?: string;
   titulo: string;
@@ -202,25 +203,25 @@ export interface ItemSolicitacaoCompra {
 }
 
 // Status de compra
-export type StatusCompra =
-  | 'pendente'
-  | 'parcialmente_recebida'
-  | 'recebida'
-  | 'cancelada';
+export type StatusCompra = 
+  | "pendente" 
+  | "parcialmente_recebida" 
+  | "recebida" 
+  | "cancelada";
 
 // Interface de compra
 export interface Compra {
   id: string;
   solicitacaoId?: string;
-  projetoId?: string;
-  fornecedorId?: string;
+  projetoId: string;
+  fornecedorId: string;
   responsavelId: string;
   numeroNotaFiscal?: string;
   valorTotal: number;
   dataCompra: Date;
   dataEntrega?: Date;
   status: StatusCompra;
-  itens: ItemCompra[];
+  itens: any[]; // Pode ser substituído por um tipo mais específico
 }
 
 // Interface de item de compra
@@ -322,12 +323,12 @@ export interface Notificacao {
   id: string;
   titulo: string;
   mensagem: string;
-  tipo: 'info' | 'success' | 'warning' | 'error';
-  destinatarioIds: string[];
+  tipo: "info" | "success" | "warning" | "error";
   lida: boolean;
   dataCriacao: Date;
+  destinatarioIds: string[];
   dadosReferencia?: {
-    tipo: 'solicitacao' | 'orcamento' | 'compra' | 'projeto' | 'tarefa';
+    tipo: "solicitacao" | "orcamento" | "compra" | "projeto" | "tarefa";
     id: string;
   };
 }

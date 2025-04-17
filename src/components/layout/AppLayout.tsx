@@ -37,7 +37,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+      <AppSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
       <div className="flex flex-col flex-1">
         <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background px-4 h-14">
           <Button

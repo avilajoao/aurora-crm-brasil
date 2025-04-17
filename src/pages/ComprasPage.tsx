@@ -3,9 +3,7 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter, Edit, MoveHorizontal, FileText, Building2, User, Calendar } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Search, Plus, Filter } from 'lucide-react';
 import { StatusCompra, Compra } from "@/types";
 import { 
   Dialog,
@@ -22,8 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionGuard, PermissionButton } from "@/components/auth/PermissionGuard";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { PermissionButton } from "@/components/auth/PermissionGuard";
+import { ComprasBoard } from "@/components/compras/ComprasBoard";
 
 const statusColors: Record<string, string> = {
   pendente: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
@@ -117,10 +115,6 @@ export function ComprasPage() {
     compra.projetoId.includes(searchTerm)
   );
 
-  const formatarData = (data: Date) => {
-    return new Date(data).toLocaleDateString('pt-BR');
-  };
-
   const handleStatusChange = (status: StatusCompra) => {
     if (selectedCompra) {
       const updatedCompras = compras.map(compra => 
@@ -174,11 +168,6 @@ export function ComprasPage() {
     });
   };
 
-  // Agrupamento das compras por status
-  const comprasPorStatus = (status: StatusCompra) => {
-    return filteredCompras.filter(compra => compra.status === status);
-  };
-
   // Lista de todos os status para exibir as colunas
   const statusList: StatusCompra[] = ["pendente", "parcialmente_recebida", "recebida", "cancelada"];
 
@@ -220,90 +209,22 @@ export function ComprasPage() {
         {/* Layout de quadros para compras */}
         <div className="flex gap-4 overflow-x-auto pb-6">
           {statusList.map((status) => (
-            <div 
+            <ComprasBoard
               key={status}
-              className="flex-shrink-0 w-80 flex flex-col"
+              status={status}
+              compras={filteredCompras}
+              draggingId={draggingId}
+              onDragStart={handleDragStart}
+              onDragEnd={() => setDraggingId(null)}
               onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, status)}
-            >
-              <div className="mb-3 sticky top-0 bg-background z-10">
-                <div className="flex items-center justify-between border rounded-md p-3">
-                  <Badge className={cn("font-normal text-sm", statusColors[status])}>
-                    {statusNames[status]}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {comprasPorStatus(status).length} compra(s)
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                {comprasPorStatus(status).map((compra) => (
-                  <Card 
-                    key={compra.id}
-                    className={cn(
-                      "cursor-move shadow-sm hover:shadow-md transition-all",
-                      draggingId === compra.id ? "opacity-50" : "opacity-100"
-                    )}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, compra.id)}
-                    onDragEnd={() => setDraggingId(null)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-base">Compra #{compra.id}</h3>
-                        <MoveHorizontal className="h-4 w-4 text-muted-foreground opacity-50" />
-                      </div>
-                      <div className="space-y-1.5 my-2">
-                        <div className="flex items-center gap-1 text-sm">
-                          <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>NF: {compra.numeroNotaFiscal || "Pendente"}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>Projeto #{compra.projetoId}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          <User className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>Responsável #{compra.responsavelId}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                          <span>{formatarData(compra.dataCompra)}</span>
-                        </div>
-                      </div>
-                      <PermissionGuard
-                        requiredPermission="view_purchase_values"
-                        fallback={<div className="mt-3 text-sm text-muted-foreground">Valor: Restrito</div>}
-                      >
-                        <div className="mt-3 font-medium">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(compra.valorTotal)}
-                        </div>
-                      </PermissionGuard>
-                    </CardContent>
-                    <CardFooter className="px-4 py-2 flex justify-end gap-2 border-t">
-                      <PermissionGuard requiredPermission="change_purchase_status">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedCompra(compra);
-                            setIsStatusDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-3.5 w-3.5" />
-                        </Button>
-                      </PermissionGuard>
-                    </CardFooter>
-                  </Card>
-                ))}
-                {comprasPorStatus(status).length === 0 && (
-                  <div className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center text-center text-muted-foreground">
-                    <p className="text-sm">Sem compras neste status</p>
-                  </div>
-                )}
-              </div>
-            </div>
+              onDrop={handleDrop}
+              onEditClick={(compra) => {
+                setSelectedCompra(compra);
+                setIsStatusDialogOpen(true);
+              }}
+              statusNames={statusNames}
+              statusColors={statusColors}
+            />
           ))}
         </div>
 
