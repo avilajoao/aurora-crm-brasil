@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, UserRole } from '@/types';
+import { User, UserRole, Notificacao } from '@/types';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -10,6 +10,9 @@ interface AuthContextType {
   login: (user: User) => void;
   logout: () => void;
   updateUserRole: (role: UserRole) => void;
+  notificacoes: Notificacao[];
+  addNotificacao: (notificacao: Omit<Notificacao, 'id' | 'dataCriacao'>) => void;
+  marcarNotificacaoComoLida: (id: string) => void;
 }
 
 // Default user for demo purposes
@@ -39,6 +42,11 @@ const rolePermissions: Record<UserRole, string[]> = {
     'approve_purchase_requests',
     'view_team_allocation',
     'edit_team_allocation',
+    'change_budget_status',
+    'view_budget_values',
+    'edit_budget_values',
+    'view_purchase_values',
+    'edit_purchase_values'
   ],
   gestor: [
     'view_financials',
@@ -50,6 +58,11 @@ const rolePermissions: Record<UserRole, string[]> = {
     'approve_purchase_requests',
     'view_team_allocation',
     'edit_team_allocation',
+    'change_budget_status',
+    'view_budget_values',
+    'edit_budget_values',
+    'view_purchase_values',
+    'edit_purchase_values'
   ],
   supervisor: [
     'view_financials',
@@ -58,12 +71,16 @@ const rolePermissions: Record<UserRole, string[]> = {
     'approve_purchase_requests',
     'view_team_allocation',
     'edit_team_allocation',
+    'change_budget_status',
+    'view_budget_values',
+    'view_purchase_values'
   ],
   rh: [
     'add_user',
     'edit_user',
     'view_team_allocation',
     'edit_team_allocation',
+    'view_financials'
   ],
   operador: [
     'view_purchase_requests',
@@ -72,6 +89,21 @@ const rolePermissions: Record<UserRole, string[]> = {
   cliente: [
     'view_own_projects',
   ],
+  vendas: [
+    'view_budget_values',
+    'edit_budget_values',
+    'change_budget_status',
+    'view_team_allocation'
+  ],
+  comprador: [
+    'view_purchase_requests',
+    'edit_purchase_requests',
+    'approve_purchase_requests',
+    'view_purchase_values',
+    'edit_purchase_values',
+    'change_purchase_status',
+    'view_team_allocation'
+  ],
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -79,6 +111,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(defaultUser); // Using default user for demo
   const [userRole, setUserRole] = useState<UserRole | null>(defaultUser.cargo as UserRole);
+  const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
   
   // Check if the user has a specific permission
   const hasPermission = (permission: string): boolean => {
@@ -112,6 +145,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const addNotificacao = (notificacao: Omit<Notificacao, 'id' | 'dataCriacao'>) => {
+    const novaNotificacao: Notificacao = {
+      ...notificacao,
+      id: Date.now().toString(),
+      dataCriacao: new Date(),
+      lida: false
+    };
+    
+    setNotificacoes(prev => [novaNotificacao, ...prev]);
+  };
+
+  const marcarNotificacaoComoLida = (id: string) => {
+    setNotificacoes(prev => prev.map(notificacao => 
+      notificacao.id === id ? {...notificacao, lida: true} : notificacao
+    ));
+  };
+
   return (
     <AuthContext.Provider value={{ 
       currentUser, 
@@ -120,7 +170,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       hasPermission,
       login,
       logout,
-      updateUserRole
+      updateUserRole,
+      notificacoes,
+      addNotificacao,
+      marcarNotificacaoComoLida
     }}>
       {children}
     </AuthContext.Provider>

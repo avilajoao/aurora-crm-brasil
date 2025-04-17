@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, Plus, Filter, ArrowUpDown, Edit } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -15,6 +15,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { StatusOrcamento, Orcamento } from "@/types";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { PermissionGuard, PermissionButton } from "@/components/auth/PermissionGuard";
 
 const statusColors: Record<string, string> = {
   rascunho: "bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-300",
@@ -113,6 +129,9 @@ const orcamentosExemplo: Orcamento[] = [
 export function OrcamentosPage() {
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>(orcamentosExemplo);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedOrcamento, setSelectedOrcamento] = useState<Orcamento | null>(null);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const filteredOrcamentos = orcamentos.filter((orcamento) =>
     orcamento.titulo.toLowerCase().includes(searchTerm.toLowerCase())
@@ -120,6 +139,23 @@ export function OrcamentosPage() {
 
   const formatarData = (data: Date) => {
     return new Date(data).toLocaleDateString('pt-BR');
+  };
+
+  const handleStatusChange = (status: StatusOrcamento) => {
+    if (selectedOrcamento) {
+      const updatedOrcamentos = orcamentos.map(orcamento => 
+        orcamento.id === selectedOrcamento.id ? { ...orcamento, status } : orcamento
+      );
+      
+      setOrcamentos(updatedOrcamentos);
+      setIsStatusDialogOpen(false);
+      
+      toast({
+        title: "Status atualizado",
+        description: `O orçamento "${selectedOrcamento.titulo}" agora está com status "${statusNames[status]}"`,
+        variant: "default",
+      });
+    }
   };
 
   return (
@@ -130,9 +166,14 @@ export function OrcamentosPage() {
             <h1 className="text-3xl font-bold tracking-tight">Orçamentos</h1>
             <p className="text-muted-foreground">Gerencie e acompanhe orçamentos de projetos</p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Novo Orçamento
-          </Button>
+          <PermissionButton
+            requiredPermission={["edit_budget_values"]}
+            component={
+              <Button>
+                <Plus className="mr-2 h-4 w-4" /> Novo Orçamento
+              </Button>
+            }
+          />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -165,6 +206,9 @@ export function OrcamentosPage() {
                 <TableHead>Validade</TableHead>
                 <TableHead>Valor Total</TableHead>
                 <TableHead>Status</TableHead>
+                <PermissionGuard requiredPermission="change_budget_status">
+                  <TableHead className="w-24">Ações</TableHead>
+                </PermissionGuard>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,17 +218,70 @@ export function OrcamentosPage() {
                   <TableCell>{orcamento.titulo}</TableCell>
                   <TableCell>{formatarData(orcamento.dataCriacao)}</TableCell>
                   <TableCell>{orcamento.dataValidade ? formatarData(orcamento.dataValidade) : '-'}</TableCell>
-                  <TableCell>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.valorTotal)}</TableCell>
+                  <PermissionGuard
+                    requiredPermission="view_budget_values"
+                    fallback={<TableCell>Restrito</TableCell>}
+                  >
+                    <TableCell>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(orcamento.valorTotal)}</TableCell>
+                  </PermissionGuard>
                   <TableCell>
                     <Badge className={cn("font-normal", statusColors[orcamento.status])}>
                       {statusNames[orcamento.status]}
                     </Badge>
                   </TableCell>
+                  <PermissionGuard requiredPermission="change_budget_status">
+                    <TableCell>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedOrcamento(orcamento);
+                          setIsStatusDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </PermissionGuard>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+
+        <Dialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Atualizar Status do Orçamento</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Orçamento: {selectedOrcamento?.titulo}</label>
+                <Select
+                  defaultValue={selectedOrcamento?.status}
+                  onValueChange={(value) => handleStatusChange(value as StatusOrcamento)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rascunho">Rascunho</SelectItem>
+                    <SelectItem value="enviado_ao_cliente">Enviado ao Cliente</SelectItem>
+                    <SelectItem value="em_revisao">Em Revisão</SelectItem>
+                    <SelectItem value="aprovado_pelo_cliente">Aprovado pelo Cliente</SelectItem>
+                    <SelectItem value="rejeitado_pelo_cliente">Rejeitado pelo Cliente</SelectItem>
+                    <SelectItem value="aguardando_modificacoes">Aguardando Modificações</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsStatusDialogOpen(false)}>Cancelar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );

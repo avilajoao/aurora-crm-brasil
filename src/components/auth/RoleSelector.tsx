@@ -23,6 +23,7 @@ export const RoleSelector: React.FC = () => {
     toast({
       title: "Papel atualizado",
       description: `Seu papel foi alterado para ${getRoleName(role)}.`,
+      variant: "default",
     });
   };
 
@@ -33,7 +34,9 @@ export const RoleSelector: React.FC = () => {
       supervisor: "Supervisor",
       rh: "Recursos Humanos",
       operador: "Operador",
-      cliente: "Cliente"
+      cliente: "Cliente",
+      vendas: "Vendas",
+      comprador: "Comprador"
     };
     
     return roleNames[role] || role;
@@ -66,6 +69,8 @@ export const RoleSelector: React.FC = () => {
                 <SelectItem value="gestor">Gestor</SelectItem>
                 <SelectItem value="supervisor">Supervisor</SelectItem>
                 <SelectItem value="rh">Recursos Humanos</SelectItem>
+                <SelectItem value="vendas">Vendas</SelectItem>
+                <SelectItem value="comprador">Comprador</SelectItem>
                 <SelectItem value="operador">Operador</SelectItem>
                 <SelectItem value="cliente">Cliente</SelectItem>
               </SelectContent>

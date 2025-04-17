@@ -20,6 +20,7 @@ import { ChatPage } from "./pages/ChatPage";
 import { ConfiguracoesPage } from "./pages/ConfiguracoesPage";
 import { RelatoriosPage } from "./pages/RelatoriosPage";
 import { UsuariosPage } from "./pages/UsuariosPage";
+import { FinanceiroPage } from "./pages/FinanceiroPage";
 import NotFound from "./pages/NotFound";
 
 // Cria um novo cliente do React Query para gerenciamento de estado e cache
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/configuracoes" element={<ConfiguracoesPage />} />
             <Route path="/relatorios" element={<RelatoriosPage />} />
             <Route path="/usuarios" element={<UsuariosPage />} />
+            <Route path="/financeiro" element={<FinanceiroPage />} />
             {/* Rota 404 para páginas não encontradas */}
             <Route path="*" element={<NotFound />} />
           </Routes>

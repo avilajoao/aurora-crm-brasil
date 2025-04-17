@@ -1,7 +1,8 @@
+
 // Definição de tipos para o Aurora CRM Brasil
 
 // Tipos de usuário
-export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente';
+export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente' | 'vendas' | 'comprador';
 
 // Interface de usuário
 export interface User {
@@ -273,9 +274,6 @@ export interface Conversa {
   mensagens: Mensagem[];
 }
 
-// Enhanced user roles with permission levels
-export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente';
-
 // Permission structure for role-based access control
 export interface Permission {
   id: string;
@@ -287,4 +285,49 @@ export interface Permission {
 // User with permissions
 export interface UserWithPermissions extends User {
   permissions: string[]; // Array of permission keys
+}
+
+// Interface for financial transactions
+export interface TransacaoFinanceira {
+  id: string;
+  tipo: 'entrada' | 'saida';
+  categoria: string;
+  descricao: string;
+  valor: number;
+  dataPrevista: Date;
+  dataEfetivada?: Date;
+  status: 'pendente' | 'paga' | 'atrasada' | 'cancelada';
+  referencia?: {
+    tipo: 'fornecedor' | 'cliente' | 'funcionario' | 'projeto' | 'outro';
+    id: string;
+    nome: string;
+  };
+  comprovante?: string;
+  observacoes?: string;
+}
+
+// Interface for team allocation
+export interface AlocacaoEquipe {
+  id: string;
+  projetoId: string;
+  membroId: string;
+  dataInicio: Date;
+  dataFim?: Date;
+  horasDiarias?: number;
+  observacoes?: string;
+}
+
+// Interface for notifications
+export interface Notificacao {
+  id: string;
+  titulo: string;
+  mensagem: string;
+  tipo: 'info' | 'success' | 'warning' | 'error';
+  destinatarioIds: string[];
+  lida: boolean;
+  dataCriacao: Date;
+  dadosReferencia?: {
+    tipo: 'solicitacao' | 'orcamento' | 'compra' | 'projeto' | 'tarefa';
+    id: string;
+  };
 }
