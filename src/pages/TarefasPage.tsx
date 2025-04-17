@@ -3,29 +3,10 @@ import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Search, 
-  Plus, 
-  Filter, 
-  ClipboardList, 
-  CheckCircle, 
-  Circle, 
-  Clock, 
-  AlertCircle, 
-  User,
-  Calendar,
-  MoveHorizontal
-} from 'lucide-react';
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, Plus, Filter, User } from 'lucide-react';
 import { StatusTarefa, PrioridadeTarefa } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { TarefasBoard } from "@/components/tarefas/TarefasBoard";
 
 // Status das tarefas
 const statusTarefas = {
@@ -148,96 +129,6 @@ const tarefasExemplo = [
   }
 ];
 
-// Componente para renderizar coluna de tarefas
-interface ColunaTarefasProps {
-  status: StatusTarefa;
-  tarefas: typeof tarefasExemplo;
-  onDrop: (e: React.DragEvent, status: StatusTarefa) => void;
-  onDragOver: (e: React.DragEvent) => void;
-}
-
-function ColunaTarefas({ status, tarefas, onDrop, onDragOver }: ColunaTarefasProps) {
-  const tarefasFiltradas = tarefas.filter(tarefa => tarefa.status === status);
-  const statusConfig = statusTarefas[status];
-
-  const formatarData = (data: Date) => {
-    return new Date(data).toLocaleDateString('pt-BR');
-  };
-
-  const getIconeStatus = (status: StatusTarefa) => {
-    switch (status) {
-      case 'pendente': return <Circle className="h-4 w-4 text-slate-500" />;
-      case 'em_andamento': return <Clock className="h-4 w-4 text-blue-500" />;
-      case 'em_revisao': return <ClipboardList className="h-4 w-4 text-amber-500" />;
-      case 'concluida': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'bloqueada': return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default: return <Circle className="h-4 w-4" />;
-    }
-  };
-
-  return (
-    <div 
-      className="flex flex-col h-full"
-      onDrop={(e) => onDrop(e, status)}
-      onDragOver={onDragOver}
-    >
-      <div className="flex items-center gap-2 mb-3 px-2">
-        {getIconeStatus(status)}
-        <h3 className="font-medium">{statusConfig.label}</h3>
-        <Badge variant="outline">{tarefasFiltradas.length}</Badge>
-      </div>
-      
-      <ScrollArea className="flex-1 pr-2">
-        <div className="space-y-3">
-          {tarefasFiltradas.map((tarefa) => (
-            <Card 
-              key={tarefa.id} 
-              className="cursor-move hover:shadow-md transition-shadow"
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData("tarefaId", tarefa.id);
-                e.dataTransfer.effectAllowed = "move";
-              }}
-            >
-              <CardContent className="p-3">
-                <div className="flex justify-between items-start">
-                  <h4 className="font-medium">{tarefa.titulo}</h4>
-                  <MoveHorizontal className="h-4 w-4 text-muted-foreground opacity-50" />
-                </div>
-                {tarefa.descricao && <p className="text-sm text-muted-foreground mt-1">{tarefa.descricao}</p>}
-                
-                <div className="mt-3 flex justify-between items-center">
-                  <Badge className={cn("font-normal", prioridadeTarefas[tarefa.prioridade].color)}>
-                    {prioridadeTarefas[tarefa.prioridade].label}
-                  </Badge>
-                  
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={tarefa.responsavel.avatar} alt={tarefa.responsavel.nome} />
-                    <AvatarFallback>{tarefa.responsavel.nome.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </div>
-                
-                {tarefa.dataVencimento && (
-                  <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <span>Vence: {formatarData(tarefa.dataVencimento)}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-          
-          {tarefasFiltradas.length === 0 && (
-            <div className="border border-dashed rounded-md p-4 flex flex-col items-center justify-center text-center text-muted-foreground">
-              <p className="text-sm">Nenhuma tarefa</p>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
-    </div>
-  );
-}
-
 export function TarefasPage() {
   const [tarefas, setTarefas] = useState(tarefasExemplo);
   const [searchTerm, setSearchTerm] = useState("");
@@ -252,6 +143,11 @@ export function TarefasPage() {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData("tarefaId", id);
+    e.dataTransfer.effectAllowed = "move";
   };
 
   const handleDrop = (e: React.DragEvent, novoStatus: StatusTarefa) => {
@@ -332,11 +228,14 @@ export function TarefasPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[calc(100vh-16rem)]">
           {statusList.map((status) => (
             <div key={status} className="border rounded-md p-4">
-              <ColunaTarefas 
+              <TarefasBoard 
                 status={status} 
                 tarefas={filteredTarefas} 
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
+                onDragStart={handleDragStart}
+                prioridadeTarefas={prioridadeTarefas}
+                statusTarefas={statusTarefas}
               />
             </div>
           ))}

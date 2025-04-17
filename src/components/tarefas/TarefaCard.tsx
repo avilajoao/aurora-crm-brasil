@@ -8,7 +8,17 @@ import { cn } from "@/lib/utils";
 import { PrioridadeTarefa } from "@/types";
 
 interface TarefaCardProps {
-  tarefa: any;
+  tarefa: {
+    id: string;
+    titulo: string;
+    descricao?: string;
+    prioridade: PrioridadeTarefa;
+    responsavel?: {
+      nome?: string;
+      avatar?: string;
+    };
+    dataVencimento?: Date;
+  };
   prioridadeTarefas: Record<string, { label: string; color: string }>;
   formatarData: (data: Date) => string;
   onDragStart: (e: React.DragEvent, id: string) => void;
@@ -43,10 +53,12 @@ export function TarefaCard({
             {prioridadeTarefas[tarefa.prioridade].label}
           </Badge>
           
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={tarefa.responsavel?.avatar} alt={tarefa.responsavel?.nome} />
-            <AvatarFallback>{tarefa.responsavel?.nome?.charAt(0) || "U"}</AvatarFallback>
-          </Avatar>
+          {tarefa.responsavel && (
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={tarefa.responsavel?.avatar} alt={tarefa.responsavel?.nome || ""} />
+              <AvatarFallback>{tarefa.responsavel?.nome?.charAt(0) || "U"}</AvatarFallback>
+            </Avatar>
+          )}
         </div>
         
         {tarefa.dataVencimento && (
