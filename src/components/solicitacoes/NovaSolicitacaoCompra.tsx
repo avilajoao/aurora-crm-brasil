@@ -15,22 +15,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Plus, X, PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { SolicitacaoCompra, ItemSolicitacaoCompra } from '@/types';
+import { SolicitacaoCompra, ItemSolicitacao } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-
-type ItemSolicitacao = Omit<ItemSolicitacaoCompra, 'id' | 'solicitacaoId'>;
 
 interface NovaSolicitacaoCompraProps {
   onSolicitacaoCriada: (solicitacao: SolicitacaoCompra) => void;
+  onClose?: () => void;
+  onSubmit?: (solicitacao: Partial<SolicitacaoCompra>) => void;
+  projetos?: { id: string; nome: string; }[];
 }
 
-export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ onSolicitacaoCriada }) => {
+export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ onSolicitacaoCriada, onClose, onSubmit, projetos }) => {
   const [open, setOpen] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [justificativa, setJustificativa] = useState('');
   const [urgente, setUrgente] = useState(false);
   const [projetoId, setProjetoId] = useState('');
-  const [itens, setItens] = useState<ItemSolicitacao[]>([]);
+  const [itens, setItens] = useState<Partial<ItemSolicitacao>[]>([]);
   const { toast } = useToast();
   const { currentUser, addNotificacao } = useAuth();
 
@@ -82,20 +83,27 @@ export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ on
       solicitanteId: currentUser?.id || "1",
       titulo,
       justificativa,
-      status: 'enviada',
+      status: "pendente",
       urgente,
       dataSolicitacao: new Date(),
       ...(projetoId && { projetoId }),
       itens: itens.map((item, index) => ({
-        ...item,
         id: `${solicitacaoId}-${index}`,
+        nome: item.descricao || '',
+        quantidade: item.quantidade || 1,
+        unidade: item.unidadeMedida || 'un',
         solicitacaoId
       })),
+      prioridade: urgente ? 'urgente' : 'media',
       comentarios: []
     };
     
     // Chamar callback para adicionar à lista
-    onSolicitacaoCriada(novaSolicitacao);
+    if (onSubmit) {
+      onSubmit(novaSolicitacao);
+    } else {
+      onSolicitacaoCriada(novaSolicitacao);
+    }
     
     // Enviar notificação para compradores e supervisores
     addNotificacao({
@@ -103,6 +111,7 @@ export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ on
       mensagem: `Nova solicitação de compra "${titulo}" criada ${urgente ? '[URGENTE]' : ''}.`,
       tipo: "info",
       destinatarioIds: ["1", "2", "3"], // IDs dos compradores e supervisores
+      lida: false,
       dadosReferencia: {
         tipo: "solicitacao",
         id: solicitacaoId
@@ -123,6 +132,11 @@ export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ on
     setProjetoId('');
     setItens([]);
     setOpen(false);
+    
+    // Se houver callback de fechamento, chamar
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (

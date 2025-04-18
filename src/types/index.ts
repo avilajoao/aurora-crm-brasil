@@ -2,7 +2,7 @@
 // Status types
 export type StatusTarefa = "pendente" | "em_andamento" | "em_revisao" | "concluida" | "bloqueada";
 export type StatusProjeto = "em_analise" | "aguardando_aprovacao" | "aprovado" | "em_andamento" | "em_pausa" | "concluido" | "cancelado";
-export type StatusSolicitacaoCompra = "pendente" | "aprovada" | "parcialmente_aprovada" | "rejeitada" | "cancelada";
+export type StatusSolicitacaoCompra = "pendente" | "aprovada" | "parcialmente_aprovada" | "rejeitada" | "cancelada" | "enviada";
 export type StatusCompra = "pendente" | "parcialmente_recebida" | "recebida" | "cancelada";
 export type StatusOrcamento = "rascunho" | "enviado_ao_cliente" | "em_revisao" | "aprovado_pelo_cliente" | "rejeitado_pelo_cliente" | "aguardando_modificacoes" | "cancelado";
 export type StatusFornecedor = "ativo" | "inativo" | "bloqueado" | "em_analise";
@@ -27,19 +27,22 @@ export type UserPermission =
   | "edit_budget_values"
   | "change_budget_status"
   | "edit_purchase_requests"
-  | "change_purchase_status";
+  | "change_purchase_status"
+  | "add_user";
 
 // Data types
-export interface Usuario {
+export interface User {
   id: string;
   nome: string;
   email: string;
-  cargo: string;
+  cargo: string | UserRole;
   departamento: string;
-  role: UserRole;
+  role?: UserRole;
   avatar?: string;
-  permissions: UserPermission[];
+  permissions?: UserPermission[];
   equipeId?: string;
+  dataCriacao?: Date;
+  ultimoAcesso?: Date;
 }
 
 export interface Notificacao {
@@ -56,6 +59,20 @@ export interface Notificacao {
   };
 }
 
+export interface ItemSolicitacao {
+  id: string;
+  nome: string;
+  quantidade: number;
+  unidade: string;
+  especificacoes?: string;
+  valorEstimado?: number;
+  aprovado?: boolean;
+  fornecedorSugerido?: string;
+  solicitacaoId?: string;
+  descricao?: string;
+  unidadeMedida?: string;
+}
+
 export interface SolicitacaoCompra {
   id: string;
   titulo: string;
@@ -69,17 +86,9 @@ export interface SolicitacaoCompra {
   prioridade: PrioridadeSolicitacao;
   observacoes?: string;
   projetoId?: string;
-}
-
-export interface ItemSolicitacao {
-  id: string;
-  nome: string;
-  quantidade: number;
-  unidade: string;
-  especificacoes?: string;
-  valorEstimado?: number;
-  aprovado?: boolean;
-  fornecedorSugerido?: string;
+  justificativa?: string;
+  urgente?: boolean;
+  comentarios?: any[];
 }
 
 export interface Compra {
@@ -121,4 +130,26 @@ export interface Projeto {
   status: StatusProjeto;
   dataPrevista: string;
   descricao?: string;
+}
+
+export interface Mensagem {
+  id: string;
+  texto: string;
+  remetente: string;
+  destinatario: string;
+  dataCriacao: Date;
+  lida: boolean;
+}
+
+export interface TransacaoFinanceira {
+  id: string;
+  tipo: "receita" | "despesa";
+  valor: number;
+  data: Date;
+  categoria: string;
+  descricao: string;
+  projetoId?: string;
+  compraId?: string;
+  orcamentoId?: string;
+  status: "pendente" | "confirmada" | "cancelada";
 }

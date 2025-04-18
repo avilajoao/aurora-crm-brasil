@@ -85,6 +85,8 @@ const cargoLabel: Record<UserRole, string> = {
   rh: 'Recursos Humanos',
   operador: 'Operador',
   cliente: 'Cliente',
+  vendas: 'Vendas',
+  comprador: 'Comprador'
 };
 
 const cargoColor: Record<UserRole, string> = {
@@ -94,6 +96,8 @@ const cargoColor: Record<UserRole, string> = {
   rh: 'bg-green-100 text-green-800',
   operador: 'bg-yellow-100 text-yellow-800',
   cliente: 'bg-gray-100 text-gray-800',
+  vendas: 'bg-pink-100 text-pink-800',
+  comprador: 'bg-teal-100 text-teal-800'
 };
 
 export const GerenciarUsuarios = () => {

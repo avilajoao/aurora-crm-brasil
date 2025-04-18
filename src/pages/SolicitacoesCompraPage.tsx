@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { StatusSolicitacaoCompra, SolicitacaoCompra, Notificacao } from "@/types";
+import { StatusSolicitacaoCompra, SolicitacaoCompra, Notificacao, TipoReferencia, TipoNotificacao } from "@/types";
 import { NovaSolicitacaoCompra } from '@/components/solicitacoes/NovaSolicitacaoCompra';
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -62,6 +61,7 @@ const statusColors: Record<string, string> = {
   parcialmente_aprovada: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
   rejeitada: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
   cancelada: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
+  enviada: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
 };
 
 const statusNames: Record<string, string> = {
@@ -70,6 +70,7 @@ const statusNames: Record<string, string> = {
   parcialmente_aprovada: "Parcialmente Aprovada",
   rejeitada: "Rejeitada",
   cancelada: "Cancelada",
+  enviada: "Enviada",
 };
 
 // Dados de exemplo para solicitações de compra
@@ -217,7 +218,7 @@ export function SolicitacoesCompraPage() {
     const notificacao = {
       titulo: "Nova solicitação de compra",
       mensagem: `Uma nova solicitação "${novaSolic.titulo}" foi criada e aguarda aprovação.`,
-      tipo: "info" as const,
+      tipo: "info" as TipoNotificacao,
       destinatarioIds: ["1", "3"], // IDs dos aprovadores
       lida: false,
       dadosReferencia: {
@@ -358,6 +359,7 @@ export function SolicitacoesCompraPage() {
                 </DialogDescription>
               </DialogHeader>
               <NovaSolicitacaoCompra
+                onSolicitacaoCriada={criarSolicitacao}
                 onClose={() => setIsDialogOpen(false)}
                 onSubmit={criarSolicitacao}
                 projetos={projetos}
