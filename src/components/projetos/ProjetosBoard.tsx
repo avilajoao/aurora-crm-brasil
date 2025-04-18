@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { StatusProjeto } from "@/types";
 import { ProjetoCard } from './ProjetoCard';
+import { ProjectDetails } from './ProjectDetails';
 
 interface Projeto {
   id: string;
@@ -43,6 +43,7 @@ export function ProjetosBoard({
   statusNames,
   statusColors
 }: ProjetosBoardProps) {
+  const [selectedProject, setSelectedProject] = React.useState<Projeto | null>(null);
   const projetosFiltrados = projetos.filter(projeto => projeto.status === status);
 
   return (
@@ -72,6 +73,7 @@ export function ProjetosBoard({
             onEditClick={onEditClick}
             onDeleteClick={onDeleteClick}
             statusColors={statusColors}
+            onViewDetails={() => setSelectedProject(projeto)}
           />
         ))}
         {projetosFiltrados.length === 0 && (
@@ -80,6 +82,12 @@ export function ProjetosBoard({
           </div>
         )}
       </div>
+
+      <ProjectDetails 
+        projeto={selectedProject} 
+        open={!!selectedProject} 
+        onClose={() => setSelectedProject(null)} 
+      />
     </div>
   );
 }

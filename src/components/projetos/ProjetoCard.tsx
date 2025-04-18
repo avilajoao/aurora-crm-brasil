@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Building2, Users, Calendar, MoveHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2, Building2, Users, Calendar, MoveHorizontal, Eye } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { StatusProjeto } from "@/types";
 
@@ -26,6 +24,7 @@ interface ProjetoCardProps {
   onEditClick: (projeto: Projeto) => void;
   onDeleteClick: (id: string) => void;
   statusColors: Record<string, string>;
+  onViewDetails: () => void;
 }
 
 export function ProjetoCard({
@@ -35,7 +34,8 @@ export function ProjetoCard({
   onDragEnd,
   onEditClick,
   onDeleteClick,
-  statusColors
+  statusColors,
+  onViewDetails
 }: ProjetoCardProps) {
   return (
     <Card 
@@ -78,6 +78,16 @@ export function ProjetoCard({
         </div>
       </CardContent>
       <CardFooter className="px-4 py-2 flex justify-end gap-2 border-t">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails();
+          }}
+        >
+          <Eye className="h-3.5 w-3.5" />
+        </Button>
         <Button 
           variant="ghost" 
           size="sm"
