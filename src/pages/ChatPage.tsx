@@ -25,12 +25,12 @@ const contatosExemplo = [
 const mensagensExemplo: Mensagem[] = [
   {
     id: "1",
-    conversaId: "1",
     remetente: {
       id: "2",
       nome: "Ana Silva",
       email: "ana.silva@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Projetos",
       dataCriacao: new Date("2023-01-10")
     },
     texto: "Olá! Acabei de revisar o orçamento que você enviou para o projeto de reforma do escritório central.",
@@ -39,12 +39,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "2",
-    conversaId: "1",
     remetente: {
       id: "1",
       nome: "Usuário Exemplo",
       email: "usuario@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Administrativo",
       dataCriacao: new Date("2023-01-05")
     },
     texto: "Oi Ana! Obrigado por revisar. Encontrou algum ponto que precisa ser ajustado?",
@@ -53,12 +53,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "3",
-    conversaId: "1",
     remetente: {
       id: "2",
       nome: "Ana Silva",
       email: "ana.silva@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Projetos",
       dataCriacao: new Date("2023-01-10")
     },
     texto: "Sim, na verdade precisamos revisar os custos de material elétrico. Parece que os preços aumentaram desde a última cotação.",
@@ -67,12 +67,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "4",
-    conversaId: "1",
     remetente: {
       id: "1",
       nome: "Usuário Exemplo",
       email: "usuario@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Administrativo",
       dataCriacao: new Date("2023-01-05")
     },
     texto: "Entendi. Vou solicitar novas cotações com nossos fornecedores e atualizar o orçamento ainda hoje.",
@@ -81,12 +81,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "5",
-    conversaId: "1",
     remetente: {
       id: "2",
       nome: "Ana Silva",
       email: "ana.silva@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Projetos",
       dataCriacao: new Date("2023-01-10")
     },
     texto: "Perfeito! Assim que tiver a versão atualizada, podemos agendar uma reunião com o cliente para apresentação.",
@@ -95,12 +95,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "6",
-    conversaId: "1",
     remetente: {
       id: "2",
       nome: "Ana Silva",
       email: "ana.silva@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Projetos",
       dataCriacao: new Date("2023-01-10")
     },
     texto: "Também precisamos revisar o cronograma de execução, pois o cliente solicitou que a obra seja finalizada uma semana antes do previsto inicialmente.",
@@ -109,12 +109,12 @@ const mensagensExemplo: Mensagem[] = [
   },
   {
     id: "7",
-    conversaId: "1",
     remetente: {
       id: "1",
       nome: "Usuário Exemplo",
       email: "usuario@auroracrm.com.br",
       cargo: "gestor",
+      departamento: "Administrativo",
       dataCriacao: new Date("2023-01-05")
     },
     texto: "Vou verificar com a equipe de execução se conseguimos antecipar a conclusão. Isso pode implicar em custos adicionais com horas extras. Devo incluir essa possibilidade no orçamento revisado?",
