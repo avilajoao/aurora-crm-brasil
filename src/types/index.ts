@@ -17,7 +17,7 @@ export type UserRole = "admin" | "gestor" | "supervisor" | "operador" | "rh" | "
 
 // Notification types
 export type TipoNotificacao = "info" | "success" | "warning" | "error";
-export type TipoReferencia = "tarefa" | "projeto" | "orcamento" | "compra" | "solicitacao";
+export type TipoReferencia = "tarefa" | "projeto" | "orcamento" | "compra" | "solicitacao" | "fornecedor" | "cliente" | "outro";
 
 // User permissions
 export type UserPermission = 
@@ -28,7 +28,9 @@ export type UserPermission =
   | "change_budget_status"
   | "edit_purchase_requests"
   | "change_purchase_status"
-  | "add_user";
+  | "add_user"
+  | "view_financials"
+  | "edit_financials";
 
 // Data types
 export interface User {
@@ -43,6 +45,7 @@ export interface User {
   equipeId?: string;
   dataCriacao?: Date;
   ultimoAcesso?: Date;
+  telefone?: string;
 }
 
 export interface Notificacao {
@@ -135,15 +138,15 @@ export interface Projeto {
 export interface Mensagem {
   id: string;
   texto: string;
-  remetente: string;
-  destinatario: string;
+  remetente: User;
+  destinatario: User;
   dataCriacao: Date;
   lida: boolean;
 }
 
 export interface TransacaoFinanceira {
   id: string;
-  tipo: "receita" | "despesa";
+  tipo: "entrada" | "saida";
   valor: number;
   data: Date;
   categoria: string;
@@ -151,5 +154,12 @@ export interface TransacaoFinanceira {
   projetoId?: string;
   compraId?: string;
   orcamentoId?: string;
-  status: "pendente" | "confirmada" | "cancelada";
+  status: "pendente" | "paga" | "atrasada" | "cancelada";
+  dataPrevista?: Date;
+  dataEfetivada?: Date;
+  referencia?: {
+    tipo: TipoReferencia;
+    id: string;
+    nome: string;
+  };
 }

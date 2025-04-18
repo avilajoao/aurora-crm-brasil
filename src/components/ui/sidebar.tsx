@@ -160,15 +160,19 @@ export function SidebarMenuItem({
 
 export function SidebarMenuButton({
   className,
+  children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
+      type="button"
       className={cn(
         "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </button>
   );
 }

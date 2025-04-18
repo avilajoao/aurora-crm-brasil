@@ -38,6 +38,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Fornecedor",
     descricao: "Pagamento Fornecedor Aço",
     valor: 12500,
+    data: new Date("2023-06-14"),
     dataPrevista: new Date("2023-06-15"),
     dataEfetivada: new Date("2023-06-14"),
     status: "paga",
@@ -53,6 +54,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Pagamento Projeto Reforma Escritório",
     valor: 45000,
+    data: new Date("2023-06-20"),
     dataPrevista: new Date("2023-06-20"),
     dataEfetivada: new Date("2023-06-20"),
     status: "paga",
@@ -68,6 +70,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Funcionário",
     descricao: "Folha de Pagamento Junho",
     valor: 35000,
+    data: new Date("2023-06-30"),
     dataPrevista: new Date("2023-06-30"),
     status: "pendente",
     referencia: {
@@ -82,6 +85,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Fornecedor",
     descricao: "Pagamento Fornecedor Material Elétrico",
     valor: 4800,
+    data: new Date("2023-06-11"),
     dataPrevista: new Date("2023-06-10"),
     dataEfetivada: new Date("2023-06-11"),
     status: "paga",
@@ -97,6 +101,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Adiantamento Projeto Galpão Industrial",
     valor: 120000,
+    data: new Date("2023-06-25"),
     dataPrevista: new Date("2023-06-25"),
     status: "pendente",
     referencia: {
@@ -111,6 +116,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Operacional",
     descricao: "Aluguel Equipamentos",
     valor: 7500,
+    data: new Date("2023-06-05"),
     dataPrevista: new Date("2023-06-05"),
     dataEfetivada: new Date("2023-06-05"),
     status: "paga",
@@ -126,6 +132,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Pagamento Final Projeto Elétrico",
     valor: 18500,
+    data: new Date("2023-06-18"),
     dataPrevista: new Date("2023-06-18"),
     status: "atrasada",
     referencia: {
@@ -172,7 +179,7 @@ export function FinanceiroPage() {
 
   const transacoesFiltradas = transacoes.filter((transacao) => {
     const matchesSearch = transacao.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          transacao.referencia?.nome.toLowerCase().includes(searchTerm.toLowerCase());
+                          (transacao.referencia?.nome.toLowerCase().includes(searchTerm.toLowerCase()) || false);
     
     if (filtroTipo === "todos") return matchesSearch;
     return matchesSearch && transacao.tipo === filtroTipo;
@@ -405,7 +412,7 @@ export function FinanceiroPage() {
                         <TableCell>{transacao.descricao}</TableCell>
                         <TableCell>{transacao.categoria}</TableCell>
                         <TableCell>{transacao.referencia?.nome}</TableCell>
-                        <TableCell>{formatarData(transacao.dataPrevista)}</TableCell>
+                        <TableCell>{transacao.dataPrevista && formatarData(transacao.dataPrevista)}</TableCell>
                         <TableCell>
                           <div className={transacao.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'}>
                             {transacao.tipo === 'entrada' ? '+' : '-'} 

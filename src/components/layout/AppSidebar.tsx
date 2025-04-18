@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import {
@@ -32,12 +33,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 
-export function AppSidebar() {
+// Main sidebar component with props interface
+interface AppSidebarProps {
+  isOpen?: boolean;
+  onToggle?: () => void;
+}
+
+export function AppSidebar({ isOpen, onToggle }: AppSidebarProps) {
   const { hasPermission } = useAuth();
 
   return (
     <SidebarProvider defaultOpen>
-      <Sidebar>
+      <Sidebar isOpen={isOpen} onToggle={onToggle}>
         <SidebarHeader className="flex h-14 items-center border-b px-4">
           <div className="flex items-center gap-2 font-semibold">
             <Building2 className="h-6 w-6" />
@@ -50,137 +57,137 @@ export function AppSidebar() {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Dashboard">
-                <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Home className="h-[1.2rem] w-[1.2rem]" />
                   <span>Dashboard</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Leads">
-                <NavLink to="/leads" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/leads" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Contact className="h-[1.2rem] w-[1.2rem]" />
                   <span>Leads</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Clientes">
-                <NavLink to="/clientes" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/clientes" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Users className="h-[1.2rem] w-[1.2rem]" />
                   <span>Clientes</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Projetos">
-                <NavLink to="/projetos" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/projetos" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <ClipboardList className="h-[1.2rem] w-[1.2rem]" />
                   <span>Projetos</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Orçamentos">
-                <NavLink to="/orcamentos" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/orcamentos" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <FileText className="h-[1.2rem] w-[1.2rem]" />
                   <span>Orçamentos</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Compras">
-                <NavLink to="/compras" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/compras" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
                   <span>Compras</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Solicitações">
-                <NavLink to="/compras/solicitacoes" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/compras/solicitacoes" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Package className="h-[1.2rem] w-[1.2rem]" />
                   <span>Solicitações</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Fornecedores">
-                <NavLink to="/fornecedores" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/fornecedores" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Truck className="h-[1.2rem] w-[1.2rem]" />
                   <span>Fornecedores</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Equipes">
-                <NavLink to="/equipes" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/equipes" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Users className="h-[1.2rem] w-[1.2rem]" />
                   <span>Equipes</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Calendário">
-                <NavLink to="/calendario" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/calendario" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <Calendar className="h-[1.2rem] w-[1.2rem]" />
                   <span>Calendário</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Tarefas">
-                <NavLink to="/tarefas" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/tarefas" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <CheckSquare className="h-[1.2rem] w-[1.2rem]" />
                   <span>Tarefas</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Chat">
-                <NavLink to="/chat" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/chat" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <MessageSquare className="h-[1.2rem] w-[1.2rem]" />
                   <span>Chat</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Relatórios">
-                <NavLink to="/relatorios" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/relatorios" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <BarChart3 className="h-[1.2rem] w-[1.2rem]" />
                   <span>Relatórios</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
             {hasPermission('add_user') && (
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Usuários">
-                  <NavLink to="/usuarios" className={({ isActive }) => isActive ? "active" : ""}>
+                <NavLink to="/usuarios" className={({ isActive }) => isActive ? "active" : ""}>
+                  <SidebarMenuButton>
                     <Users className="h-[1.2rem] w-[1.2rem]" />
                     <span>Usuários</span>
-                  </NavLink>
-                </SidebarMenuButton>
+                  </SidebarMenuButton>
+                </NavLink>
               </SidebarMenuItem>
             )}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Financeiro">
-                <NavLink to="/financeiro" className={({ isActive }) => isActive ? "active" : ""}>
+              <NavLink to="/financeiro" className={({ isActive }) => isActive ? "active" : ""}>
+                <SidebarMenuButton>
                   <CircleDollarSign className="h-[1.2rem] w-[1.2rem]" />
                   <span>Financeiro</span>
-                </NavLink>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </NavLink>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <div className="flex items-center justify-between p-4">
-            <Button variant="ghost" size="icon" asChild>
-              <NavLink to="/configuracoes">
+            <NavLink to="/configuracoes">
+              <Button variant="ghost" size="icon">
                 <Settings className="h-[1.2rem] w-[1.2rem]" />
                 <span className="sr-only">Configurações</span>
-              </NavLink>
-            </Button>
+              </Button>
+            </NavLink>
           </div>
         </SidebarFooter>
       </Sidebar>
