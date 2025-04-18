@@ -7,13 +7,25 @@ import { Card } from '@/components/ui/card';
 import { CheckCircle, Clock, CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+
+interface Evento {
+  id: string;
+  titulo: string;
+  data: Date;
+  duracao: string;
+  tipo: string;
+  concluido: boolean;
+}
 
 export function CalendarioPage() {
+  const { toast } = useToast();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState<Date>(new Date());
   
-  // Dados de exemplo
-  const eventos = [
+  // Dados de exemplo com useState para permitir a atualização do estado
+  const [eventos, setEventos] = useState<Evento[]>([
     { 
       id: "1", 
       titulo: "Reunião com Cliente", 
@@ -54,7 +66,7 @@ export function CalendarioPage() {
       tipo: "obra",
       concluido: false
     }
-  ];
+  ]);
 
   // Filtra eventos para o dia selecionado
   const eventosDoDia = eventos.filter(evento => 
@@ -66,6 +78,21 @@ export function CalendarioPage() {
 
   // Ordena eventos por hora
   const eventosOrdenados = [...eventosDoDia].sort((a, b) => a.data.getTime() - b.data.getTime());
+
+  // Função para marcar evento como concluído
+  const toggleEventoConcluido = (id: string) => {
+    setEventos(eventos.map(evento => 
+      evento.id === id 
+        ? { ...evento, concluido: !evento.concluido } 
+        : evento
+    ));
+    
+    const evento = eventos.find(e => e.id === id);
+    toast({
+      title: evento?.concluido ? "Evento reaberto" : "Evento concluído",
+      description: `${evento?.titulo} foi ${evento?.concluido ? "reaberto" : "marcado como concluído"}.`,
+    });
+  };
 
   // Formata hora para exibição
   const formatarHora = (data: Date) => {
@@ -162,9 +189,16 @@ export function CalendarioPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
-                          <h3 className={`font-medium ${evento.concluido ? 'line-through text-muted-foreground' : ''}`}>
-                            {evento.titulo}
-                          </h3>
+                          <div className="flex items-center gap-2">
+                            <Checkbox 
+                              checked={evento.concluido} 
+                              onCheckedChange={() => toggleEventoConcluido(evento.id)}
+                              id={`evento-${evento.id}`}
+                            />
+                            <h3 className={`font-medium ${evento.concluido ? 'line-through text-muted-foreground' : ''}`}>
+                              {evento.titulo}
+                            </h3>
+                          </div>
                           <Badge className={tipoEventoCores[evento.tipo]}>
                             {evento.tipo.charAt(0).toUpperCase() + evento.tipo.slice(1)}
                           </Badge>

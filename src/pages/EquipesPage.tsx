@@ -26,6 +26,7 @@ import { Team, TeamMember, Project } from "@/types/teams";
 import { useAuth } from "@/contexts/AuthContext";
 import { PermissionGuard, PermissionButton } from "@/components/auth/PermissionGuard";
 import { NovaEquipe } from "@/components/equipes/NovaEquipe";
+import { MemberCard } from "@/components/equipes/MemberCard";
 
 const projetosExemplo: Project[] = [
   {
@@ -165,7 +166,35 @@ export function EquipesPage() {
     equipe.membros.some(membro => membro.nome.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const alocarMembro = (membroId: string, projetoId: string, equipeId: string) => {
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+  
+  const handleDrop = (e: React.DragEvent, projetoId: string) => {
+    e.preventDefault();
+    const membroId = e.dataTransfer.getData("memberId");
+    
+    if (membroId) {
+      let membroEncontrado: TeamMember | null = null;
+      
+      equipes.forEach(equipe => {
+        if (equipe.lider.id === membroId) {
+          membroEncontrado = equipe.lider;
+        } else {
+          const membro = equipe.membros.find(m => m.id === membroId);
+          if (membro) {
+            membroEncontrado = membro;
+          }
+        }
+      });
+      
+      if (membroEncontrado) {
+        alocarMembroAoProjeto(membroEncontrado, projetoId);
+      }
+    }
+  };
+
+  const alocarMembroAoProjeto = (membro: TeamMember, projetoId: string) => {
     if (!hasPermission('edit_team_allocation')) {
       toast({
         title: "Acesso negado",
@@ -177,11 +206,7 @@ export function EquipesPage() {
 
     const projetoAtualizado = projetos.map(projeto => {
       if (projeto.id === projetoId) {
-        const equipe = equipes.find(e => e.id === equipeId);
-        const membro = equipe?.membros.find(m => m.id === membroId) || 
-                      equipe?.lider.id === membroId ? equipe.lider : null;
-        
-        if (membro && !projeto.membrosAlocados.find(m => m.id === membroId)) {
+        if (!projeto.membrosAlocados.find(m => m.id === membro.id)) {
           return {
             ...projeto,
             membrosAlocados: [...projeto.membrosAlocados, membro]
@@ -194,7 +219,7 @@ export function EquipesPage() {
     setProjetos(projetoAtualizado);
     toast({
       title: "Membro alocado",
-      description: "Membro foi alocado ao projeto com sucesso.",
+      description: `${membro.nome} foi alocado ao projeto com sucesso.`,
       variant: "default",
     });
   };
@@ -203,69 +228,36 @@ export function EquipesPage() {
     setEquipes([...equipes, novaEquipe]);
   };
 
-  const AlocacaoDialog = ({ membro, equipeId }: { membro: TeamMember; equipeId: string }) => (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Alocar
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Alocar Membro a Projeto</DialogTitle>
-          <DialogDescription>
-            Selecione o projeto para alocar {membro.nome}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Select onValueChange={(projetoId) => alocarMembro(membro.id, projetoId, equipeId)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um projeto" />
-              </SelectTrigger>
-              <SelectContent>
-                {projetos.map((projeto) => (
-                  <SelectItem key={projeto.id} value={projeto.id}>
-                    {projeto.nome}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-
-  const renderMemberCard = (membro: TeamMember, equipeId: string, isLider: boolean = false) => (
-    <div key={membro.id} className="flex items-start justify-between p-3 border rounded-lg bg-background">
-      <div className="flex items-start space-x-4">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={membro.avatar} alt={membro.nome} />
-          <AvatarFallback>{membro.nome.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="font-medium flex items-center gap-2">
-            {membro.nome}
-            {isLider && <Badge variant="outline">Líder</Badge>}
-          </div>
-          <div className="text-sm text-muted-foreground">{membro.cargo}</div>
-          <div className="flex items-center gap-2 text-sm mt-1">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <span>{membro.email}</span>
-          </div>
-          {membro.telefone && (
-            <div className="flex items-center gap-2 text-sm">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{membro.telefone}</span>
-            </div>
-          )}
-        </div>
+  const ProjetosList = () => (
+    <div className="mt-6">
+      <h2 className="text-xl font-bold mb-3">Projetos Ativos</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {projetos.map(projeto => (
+          <Card key={projeto.id} 
+            className="border-2 border-dashed" 
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, projeto.id)}
+          >
+            <CardContent className="p-4">
+              <h3 className="font-medium">{projeto.nome}</h3>
+              <p className="text-sm text-muted-foreground mb-2">Arraste membros para este projeto</p>
+              
+              {projeto.membrosAlocados.length > 0 ? (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {projeto.membrosAlocados.map(membro => (
+                    <Badge key={membro.id} className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      {membro.nome}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Nenhum membro alocado</p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-      <PermissionGuard requiredPermission="edit_team_allocation">
-        <AlocacaoDialog membro={membro} equipeId={equipeId} />
-      </PermissionGuard>
     </div>
   );
 
@@ -312,13 +304,15 @@ export function EquipesPage() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="text-sm font-medium mb-3">Líder da Equipe</h4>
-                    {renderMemberCard(equipe.lider, equipe.id, true)}
+                    <MemberCard membro={equipe.lider} isLider={true} />
                   </div>
                   
                   <div>
                     <h4 className="text-sm font-medium mb-3">Membros da Equipe</h4>
                     <div className="space-y-3">
-                      {equipe.membros.map((membro) => renderMemberCard(membro, equipe.id))}
+                      {equipe.membros.map((membro) => (
+                        <MemberCard key={membro.id} membro={membro} />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -326,6 +320,8 @@ export function EquipesPage() {
             </Card>
           ))}
         </div>
+        
+        <ProjetosList />
       </div>
     </AppLayout>
   );

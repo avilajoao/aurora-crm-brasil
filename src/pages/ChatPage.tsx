@@ -22,101 +22,77 @@ const contatosExemplo = [
   { id: "8", nome: "Juliana Martins", cargo: "Cliente", online: false, ultimaMensagem: "Podemos agendar uma visita na próxima semana?" },
 ];
 
+const usuarioExemplo = {
+  id: "1",
+  nome: "Usuário Exemplo",
+  email: "usuario@auroracrm.com.br",
+  cargo: "gestor",
+  departamento: "Administrativo",
+  dataCriacao: new Date("2023-01-05")
+};
+
+const anaUsuario = {
+  id: "2",
+  nome: "Ana Silva",
+  email: "ana.silva@auroracrm.com.br",
+  cargo: "gestor",
+  departamento: "Projetos",
+  dataCriacao: new Date("2023-01-10")
+};
+
 const mensagensExemplo: Mensagem[] = [
   {
     id: "1",
-    remetente: {
-      id: "2",
-      nome: "Ana Silva",
-      email: "ana.silva@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Projetos",
-      dataCriacao: new Date("2023-01-10")
-    },
+    remetente: anaUsuario,
+    destinatario: usuarioExemplo,
     texto: "Olá! Acabei de revisar o orçamento que você enviou para o projeto de reforma do escritório central.",
     dataCriacao: new Date("2023-06-10T09:30:00"),
     lida: true
   },
   {
     id: "2",
-    remetente: {
-      id: "1",
-      nome: "Usuário Exemplo",
-      email: "usuario@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Administrativo",
-      dataCriacao: new Date("2023-01-05")
-    },
+    remetente: usuarioExemplo,
+    destinatario: anaUsuario,
     texto: "Oi Ana! Obrigado por revisar. Encontrou algum ponto que precisa ser ajustado?",
     dataCriacao: new Date("2023-06-10T09:35:00"),
     lida: true
   },
   {
     id: "3",
-    remetente: {
-      id: "2",
-      nome: "Ana Silva",
-      email: "ana.silva@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Projetos",
-      dataCriacao: new Date("2023-01-10")
-    },
+    remetente: anaUsuario,
+    destinatario: usuarioExemplo,
     texto: "Sim, na verdade precisamos revisar os custos de material elétrico. Parece que os preços aumentaram desde a última cotação.",
     dataCriacao: new Date("2023-06-10T09:40:00"),
     lida: true
   },
   {
     id: "4",
-    remetente: {
-      id: "1",
-      nome: "Usuário Exemplo",
-      email: "usuario@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Administrativo",
-      dataCriacao: new Date("2023-01-05")
-    },
+    remetente: usuarioExemplo,
+    destinatario: anaUsuario,
     texto: "Entendi. Vou solicitar novas cotações com nossos fornecedores e atualizar o orçamento ainda hoje.",
     dataCriacao: new Date("2023-06-10T09:45:00"),
     lida: true
   },
   {
     id: "5",
-    remetente: {
-      id: "2",
-      nome: "Ana Silva",
-      email: "ana.silva@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Projetos",
-      dataCriacao: new Date("2023-01-10")
-    },
+    remetente: anaUsuario,
+    destinatario: usuarioExemplo,
     texto: "Perfeito! Assim que tiver a versão atualizada, podemos agendar uma reunião com o cliente para apresentação.",
     dataCriacao: new Date("2023-06-10T09:50:00"),
     lida: true
   },
   {
     id: "6",
-    remetente: {
-      id: "2",
-      nome: "Ana Silva",
-      email: "ana.silva@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Projetos",
-      dataCriacao: new Date("2023-01-10")
-    },
+    remetente: anaUsuario,
+    destinatario: usuarioExemplo,
     texto: "Também precisamos revisar o cronograma de execução, pois o cliente solicitou que a obra seja finalizada uma semana antes do previsto inicialmente.",
     dataCriacao: new Date("2023-06-10T09:52:00"),
     lida: true
   },
   {
     id: "7",
-    remetente: {
-      id: "1",
-      nome: "Usuário Exemplo",
-      email: "usuario@auroracrm.com.br",
-      cargo: "gestor",
-      departamento: "Administrativo",
-      dataCriacao: new Date("2023-01-05")
-    },
+    remetente: usuarioExemplo,
+    destinatario: anaUsuario,
     texto: "Vou verificar com a equipe de execução se conseguimos antecipar a conclusão. Isso pode implicar em custos adicionais com horas extras. Devo incluir essa possibilidade no orçamento revisado?",
     dataCriacao: new Date("2023-06-10T10:00:00"),
     lida: true
@@ -153,7 +129,7 @@ export function ChatPage() {
     <AppLayout>
       <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
         {/* Lista de contatos */}
-        <div className="w-80 border-r flex flex-col">
+        <div className="w-80 border-r flex flex-col md:block hidden">
           <div className="p-4 border-b">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />

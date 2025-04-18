@@ -8,6 +8,7 @@ import { Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { NotificacoesDialog } from './NotificacoesDialog';
+import { ThemeToggle } from './ThemeToggle';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -50,6 +51,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <span className="sr-only">Alternar navegação</span>
           </Button>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <NotificacoesDialog />
             
             {currentUser && (
@@ -66,7 +68,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             )}
           </div>
         </header>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );
