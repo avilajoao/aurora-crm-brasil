@@ -1,21 +1,9 @@
-
 import { BarChart3, Building2, CreditCard, ShoppingCart } from 'lucide-react';
 import { StatusCard } from '@/components/dashboard/StatusCard';
-import { ChartCard } from '@/components/dashboard/ChartCard';
 import { RecentProjects } from '@/components/dashboard/RecentProjects';
 import { AppLayout } from '@/components/layout/AppLayout';
 
-// Dados de exemplo para o dashboard
-const chartData = [
-  { name: 'Jan', valor: 4000 },
-  { name: 'Fev', valor: 3000 },
-  { name: 'Mar', valor: 5000 },
-  { name: 'Abr', valor: 2780 },
-  { name: 'Mai', valor: 4890 },
-  { name: 'Jun', valor: 3390 },
-  { name: 'Jul', valor: 6490 },
-];
-
+// Sample data for projects list
 const projectsData = [
   {
     id: '1',
@@ -101,31 +89,6 @@ export function Dashboard() {
             trend={{ value: 18, isPositive: true }}
             icon={CreditCard}
             iconClassName="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-          />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <ChartCard
-            title="Faturamento por mês"
-            data={chartData}
-            dataKey="valor"
-            height={300}
-          />
-          <ChartCard
-            title="Projetos por status"
-            data={[
-              { name: 'Em análise', valor: 4 },
-              { name: 'Aguardando aprovação', valor: 8 },
-              { name: 'Aprovado', valor: 6 },
-              { name: 'Em andamento', valor: 24 },
-              { name: 'Em pausa', valor: 3 },
-              { name: 'Concluído', valor: 18 },
-              { name: 'Cancelado', valor: 2 },
-            ]}
-            dataKey="valor"
-            height={300}
-            strokeColor="hsl(var(--secondary))"
-            fillColor="hsl(var(--secondary) / 0.1)"
           />
         </div>
 
