@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -22,6 +21,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { PermissionButton } from "@/components/auth/PermissionGuard";
 import { ComprasBoard } from "@/components/compras/ComprasBoard";
+import { NovaCompraDialog } from "@/components/compras/NovaCompraDialog";
 
 const statusColors: Record<string, string> = {
   pendente: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
@@ -106,6 +106,7 @@ export function ComprasPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCompra, setSelectedCompra] = useState<Compra | null>(null);
   const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
+  const [isNovaCompraDialogOpen, setIsNovaCompraDialogOpen] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -132,26 +133,31 @@ export function ComprasPage() {
     }
   };
 
-  // Função para iniciar o arrastar
+  const adicionarCompra = (novaCompra: Compra) => {
+    setCompras([...compras, novaCompra]);
+    toast({
+      title: "Compra adicionada",
+      description: `A compra #${novaCompra.id} foi adicionada com sucesso.`,
+      variant: "default",
+    });
+  };
+
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData("id", id);
     setDraggingId(id);
   };
   
-  // Função para permitir soltar
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
   };
   
-  // Função para finalizar a movimentação
   const handleDrop = (e: React.DragEvent, status: StatusCompra) => {
     e.preventDefault();
     const id = e.dataTransfer.getData("id");
     
     if (!id) return;
     
-    // Atualiza o status da compra arrastada
     const comprasAtualizadas = compras.map(compra => {
       if (compra.id === id) {
         return { ...compra, status };
@@ -168,7 +174,6 @@ export function ComprasPage() {
     });
   };
 
-  // Lista de todos os status para exibir as colunas
   const statusList: StatusCompra[] = ["pendente", "parcialmente_recebida", "recebida", "cancelada"];
 
   return (
@@ -182,7 +187,7 @@ export function ComprasPage() {
           <PermissionButton
             requiredPermission={["edit_purchase_values", "edit_purchase_requests"]}
             component={
-              <Button>
+              <Button onClick={() => setIsNovaCompraDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" /> Nova Compra
               </Button>
             }
@@ -206,7 +211,6 @@ export function ComprasPage() {
           </div>
         </div>
 
-        {/* Layout de quadros para compras */}
         <div className="flex gap-4 overflow-x-auto pb-6">
           {statusList.map((status) => (
             <ComprasBoard
@@ -257,6 +261,12 @@ export function ComprasPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        
+        <NovaCompraDialog
+          open={isNovaCompraDialogOpen}
+          onOpenChange={setIsNovaCompraDialogOpen}
+          onCompraAdicionada={adicionarCompra}
+        />
       </div>
     </AppLayout>
   );
