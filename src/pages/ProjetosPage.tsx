@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +5,7 @@ import { ProjetosHeader } from "@/components/projetos/ProjetosHeader";
 import { ProjetosFilters } from "@/components/projetos/ProjetosFilters";
 import { ProjetoFormDialog } from "@/components/projetos/ProjetoFormDialog";
 import { ProjetosBoard } from "@/components/projetos/ProjetosBoard";
-import { Projeto, projectsData, clientes, responsaveis, statusList } from "@/data/projetos";
+import { Projeto, projectsData, clientes, responsaveis, statusList, statusNames, statusColors } from "@/data/projetos";
 import { StatusProjeto } from "@/types";
 
 export function ProjetosPage() {
