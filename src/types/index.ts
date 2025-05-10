@@ -1,97 +1,153 @@
-
-// Status types
-export type StatusTarefa = "pendente" | "em_andamento" | "em_revisao" | "concluida" | "bloqueada";
-export type StatusProjeto = "em_analise" | "aguardando_aprovacao" | "aprovado" | "em_andamento" | "em_pausa" | "concluido" | "cancelado";
-export type StatusSolicitacaoCompra = "pendente" | "aprovada" | "parcialmente_aprovada" | "rejeitada" | "cancelada" | "enviada";
-export type StatusCompra = "pendente" | "parcialmente_recebida" | "recebida" | "cancelada";
-export type StatusOrcamento = "rascunho" | "enviado_ao_cliente" | "em_revisao" | "aprovado_pelo_cliente" | "rejeitado_pelo_cliente" | "aguardando_modificacoes" | "cancelado";
-export type StatusFornecedor = "ativo" | "inativo" | "bloqueado" | "em_analise";
-export type StatusEquipe = "ativa" | "inativa" | "temporaria";
-
-// Priority types
-export type PrioridadeTarefa = "baixa" | "media" | "alta" | "urgente";
-export type PrioridadeSolicitacao = "baixa" | "media" | "alta" | "urgente";
-
-// User roles
-export type UserRole = "admin" | "gestor" | "supervisor" | "operador" | "rh" | "cliente" | "vendas" | "comprador";
-
-// Notification types
-export type TipoNotificacao = "info" | "success" | "warning" | "error";
-export type TipoReferencia = "tarefa" | "projeto" | "orcamento" | "compra" | "solicitacao" | "fornecedor" | "cliente" | "outro";
-
-// User permissions
-export type UserPermission = 
-  | "view_purchase_values" 
-  | "edit_purchase_values"
-  | "view_budget_values"
-  | "edit_budget_values"
-  | "change_budget_status"
-  | "edit_purchase_requests"
-  | "change_purchase_status"
-  | "add_user"
-  | "view_financials"
-  | "edit_financials";
-
-// Data types
-export interface User {
+export interface Usuario {
   id: string;
   nome: string;
   email: string;
-  cargo: string | UserRole;
-  departamento: string;
-  role?: UserRole;
-  avatar?: string;
-  permissions?: UserPermission[];
-  equipeId?: string;
-  dataCriacao?: Date;
-  ultimoAcesso?: Date;
+  senha?: string;
+  foto?: string;
   telefone?: string;
+  endereco?: string;
+  cargo?: string;
+  departamento?: string;
+  dataContratacao?: Date;
+  salario?: number;
+  nivelAcesso: string[];
+  ativo: boolean;
 }
 
 export interface Notificacao {
   id: string;
   titulo: string;
   mensagem: string;
-  tipo: TipoNotificacao;
+  tipo: "info" | "alerta" | "erro";
   dataCriacao: Date;
   lida: boolean;
-  destinatarioIds: string[];
-  dadosReferencia?: {
-    tipo: TipoReferencia;
-    id: string;
-  };
+  usuarioId?: string;
+  destinatarioIds?: string[];
+  remetenteId?: string;
+  dadosReferencia?: any;
 }
+
+export interface Projeto {
+  id: string;
+  nome: string;
+  descricao?: string;
+  clienteId: string;
+  dataInicio: Date;
+  dataTerminoPrevista?: Date;
+  dataTerminoReal?: Date;
+  status: "ativo" | "concluido" | "em_espera" | "cancelado";
+  orcamento: number;
+  progresso: number;
+  equipeResponsavel?: string[];
+  tarefas?: Tarefa[];
+  comentarios?: Comentario[];
+}
+
+export interface Tarefa {
+  id: string;
+  projetoId: string;
+  nome: string;
+  descricao?: string;
+  responsavelId: string;
+  dataInicio: Date;
+  dataTerminoPrevista: Date;
+  dataTerminoReal?: Date;
+  status: "pendente" | "em_andamento" | "concluida" | "cancelada";
+  prioridade: "baixa" | "media" | "alta";
+  comentarios?: Comentario[];
+}
+
+export interface Cliente {
+  id: string;
+  nome: string;
+  email: string;
+  telefone?: string;
+  endereco?: string;
+  cnpj?: string;
+  contatoPrincipal?: string;
+  projetos?: Projeto[];
+  comentarios?: Comentario[];
+}
+
+export interface Lead {
+  id: string;
+  nome: string;
+  email: string;
+  telefone?: string;
+  origem: string;
+  status: "novo" | "qualificado" | "em_negociacao" | "convertido" | "perdido";
+  dataContato: Date;
+  vendedorId?: string;
+  comentarios?: Comentario[];
+}
+
+export interface Orcamento {
+  id: string;
+  clienteId: string;
+  projetoId?: string;
+  dataCriacao: Date;
+  dataValidade: Date;
+  valorTotal: number;
+  status: "pendente" | "aprovado" | "reprovado";
+  itens?: ItemOrcamento[];
+  comentarios?: Comentario[];
+}
+
+export interface ItemOrcamento {
+  id: string;
+  orcamentoId: string;
+  nome: string;
+  descricao?: string;
+  quantidade: number;
+  valorUnitario: number;
+}
+
+export interface Fornecedor {
+  id: string;
+  nome: string;
+  email: string;
+  telefone?: string;
+  endereco?: string;
+  cnpj?: string;
+  contatoPrincipal?: string;
+  segmento?: string;
+  comentarios?: Comentario[];
+}
+
+export interface Equipe {
+  id: string;
+  nome: string;
+  descricao?: string;
+  membros?: Usuario[];
+  projetos?: Projeto[];
+  comentarios?: Comentario[];
+}
+
+export interface Comentario {
+  id: string;
+  autorId: string;
+  dataCriacao: Date;
+  texto: string;
+}
+
+export type StatusCompra = "pendente" | "parcialmente_recebida" | "recebida" | "cancelada";
+export type StatusSolicitacao = "pendente" | "aprovada" | "reprovada" | "cancelada" | "concluida";
+export type PrioridadeSolicitacao = "baixa" | "media" | "alta" | "urgente";
 
 export interface ItemSolicitacao {
   id: string;
   nome: string;
   quantidade: number;
   unidade: string;
-  especificacoes?: string;
-  valorEstimado?: number;
-  aprovado?: boolean;
-  fornecedorSugerido?: string;
-  solicitacaoId?: string;
-  descricao?: string;
-  unidadeMedida?: string;
+  solicitacaoId: string;
 }
 
-export interface SolicitacaoCompra {
+export interface ItemCompra {
   id: string;
-  titulo: string;
-  descricao?: string;
-  solicitanteId: string;
-  aprovadorId?: string;
-  dataAprovacao?: Date;
-  dataSolicitacao: Date;
-  status: StatusSolicitacaoCompra;
-  itens: ItemSolicitacao[];
-  prioridade: PrioridadeSolicitacao;
-  observacoes?: string;
-  projetoId?: string;
-  justificativa?: string;
-  urgente?: boolean;
-  comentarios?: any[];
+  nome: string;
+  quantidade: number;
+  valorUnitario: number;
+  unidade: string;
 }
 
 export interface Compra {
@@ -105,61 +161,20 @@ export interface Compra {
   dataCompra: Date;
   dataEntrega?: Date;
   status: StatusCompra;
-  itens: any[];
+  itens: ItemCompra[];
 }
 
-export interface Orcamento {
+export interface SolicitacaoCompra {
   id: string;
-  clienteId: string;
+  solicitanteId: string;
   titulo: string;
-  descricao?: string;
-  status: StatusOrcamento;
-  valorTotal: number;
-  responsavelId: string;
-  dataCriacao: Date;
-  dataEnvio?: Date;
+  justificativa?: string;
+  status: StatusSolicitacao;
+  urgente: boolean;
+  dataSolicitacao: Date;
   dataAprovacao?: Date;
-  dataValidade?: Date;
-  itens: any[];
-  comentarios: any[];
-}
-
-export interface Projeto {
-  id: string;
-  titulo: string;
-  cliente: string;
-  responsavel: string;
-  valor: number;
-  status: StatusProjeto;
-  dataPrevista: string;
-  descricao?: string;
-}
-
-export interface Mensagem {
-  id: string;
-  texto: string;
-  remetente: User;
-  destinatario: User;
-  dataCriacao: Date;
-  lida: boolean;
-}
-
-export interface TransacaoFinanceira {
-  id: string;
-  tipo: "entrada" | "saida";
-  valor: number;
-  data: Date;
-  categoria: string;
-  descricao: string;
   projetoId?: string;
-  compraId?: string;
-  orcamentoId?: string;
-  status: "pendente" | "paga" | "atrasada" | "cancelada";
-  dataPrevista?: Date;
-  dataEfetivada?: Date;
-  referencia?: {
-    tipo: TipoReferencia;
-    id: string;
-    nome: string;
-  };
+  itens: ItemSolicitacao[];
+  prioridade: PrioridadeSolicitacao;
+  comentarios: any[];
 }

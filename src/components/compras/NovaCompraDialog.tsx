@@ -18,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Compra, StatusCompra } from '@/types';
+import { Compra, StatusCompra, ItemCompra } from '@/types';
+import { PlusCircle, X } from 'lucide-react';
 
 interface NovaCompraDialogProps {
   open: boolean;
@@ -31,7 +32,37 @@ export function NovaCompraDialog({ open, onOpenChange, onCompraAdicionada }: Nov
   const [projetoId, setProjetoId] = useState<string>("");
   const [fornecedorId, setFornecedorId] = useState<string>("");
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState<string>("");
+  const [itens, setItens] = useState<Partial<ItemCompra>[]>([]);
   const { toast } = useToast();
+
+  const adicionarItem = () => {
+    setItens([...itens, {
+      nome: '',
+      quantidade: 1,
+      valorUnitario: 0,
+      unidade: 'un',
+    }]);
+  };
+
+  const removerItem = (index: number) => {
+    setItens(itens.filter((_, i) => i !== index));
+  };
+
+  const atualizarItem = (index: number, campo: keyof ItemCompra, valor: any) => {
+    const novosItens = [...itens];
+    novosItens[index] = { ...novosItens[index], [campo]: valor };
+    
+    // Recalcular o valor total com base nos itens
+    if (campo === 'valorUnitario' || campo === 'quantidade') {
+      const novoValorTotal = novosItens.reduce((total, item) => {
+        return total + ((item.valorUnitario || 0) * (item.quantidade || 0));
+      }, 0);
+      
+      setValorTotal(novoValorTotal.toFixed(2));
+    }
+    
+    setItens(novosItens);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +85,13 @@ export function NovaCompraDialog({ open, onOpenChange, onCompraAdicionada }: Nov
       valorTotal: parseFloat(valorTotal),
       dataCompra: new Date(),
       status: "pendente" as StatusCompra,
-      itens: []
+      itens: itens.map((item, index) => ({
+        id: `item-${Date.now()}-${index}`,
+        nome: item.nome || `Item ${index + 1}`,
+        quantidade: item.quantidade || 1,
+        valorUnitario: item.valorUnitario || 0,
+        unidade: item.unidade || 'un',
+      }))
     };
     
     onCompraAdicionada(novaCompra);
@@ -64,6 +101,7 @@ export function NovaCompraDialog({ open, onOpenChange, onCompraAdicionada }: Nov
     setProjetoId("");
     setFornecedorId("");
     setNumeroNotaFiscal("");
+    setItens([]);
     
     // Fechar diálogo
     onOpenChange(false);
@@ -76,7 +114,7 @@ export function NovaCompraDialog({ open, onOpenChange, onCompraAdicionada }: Nov
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Nova Compra</DialogTitle>
         </DialogHeader>
@@ -135,6 +173,83 @@ export function NovaCompraDialog({ open, onOpenChange, onCompraAdicionada }: Nov
                 onChange={(e) => setNumeroNotaFiscal(e.target.value)}
               />
             </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <Label>Itens da Compra</Label>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={adicionarItem}
+              >
+                <PlusCircle className="h-4 w-4 mr-1" /> Adicionar Item
+              </Button>
+            </div>
+            
+            {itens.length > 0 ? (
+              <div className="space-y-3">
+                {itens.map((item, index) => (
+                  <div key={index} className="grid grid-cols-12 gap-2 items-end border p-3 rounded-md">
+                    <div className="col-span-4">
+                      <Label htmlFor={`item-${index}-nome`} className="text-xs">Nome</Label>
+                      <Input
+                        id={`item-${index}-nome`}
+                        value={item.nome}
+                        onChange={(e) => atualizarItem(index, 'nome', e.target.value)}
+                        placeholder="Nome do item"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor={`item-${index}-quantidade`} className="text-xs">Qtd.</Label>
+                      <Input
+                        id={`item-${index}-quantidade`}
+                        type="number"
+                        min="1"
+                        value={item.quantidade}
+                        onChange={(e) => atualizarItem(index, 'quantidade', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor={`item-${index}-unidade`} className="text-xs">Unidade</Label>
+                      <Input
+                        id={`item-${index}-unidade`}
+                        value={item.unidade}
+                        onChange={(e) => atualizarItem(index, 'unidade', e.target.value)}
+                        placeholder="un, kg"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Label htmlFor={`item-${index}-valor`} className="text-xs">Valor Unit.</Label>
+                      <Input
+                        id={`item-${index}-valor`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.valorUnitario}
+                        onChange={(e) => atualizarItem(index, 'valorUnitario', Number(e.target.value))}
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div className="col-span-1 flex justify-end">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removerItem(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border border-dashed rounded-md p-6 text-center text-muted-foreground">
+                Nenhum item adicionado. Clique em "Adicionar Item".
+              </div>
+            )}
           </div>
           
           <DialogFooter>
