@@ -1,3 +1,4 @@
+
 export interface Usuario {
   id: string;
   nome: string;
@@ -18,7 +19,7 @@ export interface Notificacao {
   id: string;
   titulo: string;
   mensagem: string;
-  tipo: "info" | "alerta" | "erro";
+  tipo: "info" | "success" | "warning" | "error";
   dataCriacao: Date;
   lida: boolean;
   usuarioId?: string;
@@ -88,9 +89,10 @@ export interface Orcamento {
   dataCriacao: Date;
   dataValidade: Date;
   valorTotal: number;
-  status: "pendente" | "aprovado" | "reprovado";
+  status: "pendente" | "aprovado" | "reprovado" | "aprovado_pelo_cliente" | "enviado_ao_cliente" | "em_revisao" | "rascunho" | "rejeitado_pelo_cliente";
   itens?: ItemOrcamento[];
   comentarios?: Comentario[];
+  titulo?: string;
 }
 
 export interface ItemOrcamento {
@@ -131,7 +133,7 @@ export interface Comentario {
 }
 
 export type StatusCompra = "pendente" | "parcialmente_recebida" | "recebida" | "cancelada";
-export type StatusSolicitacao = "pendente" | "aprovada" | "reprovada" | "cancelada" | "concluida";
+export type StatusSolicitacao = "pendente" | "aprovada" | "reprovada" | "cancelada" | "concluida" | "parcialmente_aprovada" | "rejeitada";
 export type PrioridadeSolicitacao = "baixa" | "media" | "alta" | "urgente";
 
 export interface ItemSolicitacao {
@@ -140,6 +142,11 @@ export interface ItemSolicitacao {
   quantidade: number;
   unidade: string;
   solicitacaoId: string;
+  valorEstimado?: number;
+  aprovado?: boolean;
+  especificacoes?: string;
+  descricao?: string;
+  unidadeMedida?: string;
 }
 
 export interface ItemCompra {
@@ -169,6 +176,7 @@ export interface SolicitacaoCompra {
   solicitanteId: string;
   titulo: string;
   justificativa?: string;
+  descricao?: string;
   status: StatusSolicitacao;
   urgente: boolean;
   dataSolicitacao: Date;
@@ -177,4 +185,51 @@ export interface SolicitacaoCompra {
   itens: ItemSolicitacao[];
   prioridade: PrioridadeSolicitacao;
   comentarios: any[];
+  aprovadorId?: string;
+  observacoes?: string;
 }
+
+// User related types
+export type User = Usuario;
+export type UserRole = 'admin' | 'gestor' | 'supervisor' | 'rh' | 'operador' | 'cliente' | 'vendas' | 'comprador';
+
+// Project related types
+export type StatusProjeto = 'em_analise' | 'aguardando_aprovacao' | 'aprovado' | 'em_andamento' | 'em_pausa' | 'concluido' | 'cancelado';
+
+// Task related types
+export type StatusTarefa = 'pendente' | 'em_andamento' | 'em_revisao' | 'concluida' | 'bloqueada';
+export type PrioridadeTarefa = 'baixa' | 'media' | 'alta' | 'urgente';
+
+// Budget related types
+export type StatusOrcamento = 'pendente' | 'aprovado' | 'reprovado' | 'aprovado_pelo_cliente' | 'enviado_ao_cliente' | 'em_revisao' | 'rascunho' | 'rejeitado_pelo_cliente';
+
+// Financial types
+export interface TransacaoFinanceira {
+  id: string;
+  tipo: 'receita' | 'despesa';
+  valor: number;
+  dataTransacao: Date;
+  descricao: string;
+  categoria: string;
+  status: 'pendente' | 'concluida' | 'cancelada';
+  projetoId?: string;
+  arquivos?: string[];
+}
+
+// Chat types
+export interface Mensagem {
+  id: string;
+  texto: string;
+  remetenteId: string;
+  destinatarioId: string;
+  dataCriacao: Date;
+  lida: boolean;
+  anexos?: string[];
+}
+
+// Notification types
+export type TipoNotificacao = 'info' | 'success' | 'warning' | 'error';
+export type TipoReferencia = 'solicitacao' | 'orcamento' | 'projeto' | 'tarefa' | 'compra';
+
+// Purchase request types
+export type StatusSolicitacaoCompra = StatusSolicitacao;
