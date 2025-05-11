@@ -86,11 +86,12 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     status: "aprovada",
     prioridade: "media",
     itens: [
-      { id: "1-1", nome: "Resma de papel A4", quantidade: 20, unidade: "un", valorEstimado: 18.90, aprovado: true },
-      { id: "1-2", nome: "Canetas esferográficas", quantidade: 50, unidade: "un", valorEstimado: 1.50, aprovado: true },
-      { id: "1-3", nome: "Grampeador", quantidade: 5, unidade: "un", valorEstimado: 22.50, aprovado: true }
+      { id: "1-1", nome: "Resma de papel A4", quantidade: 20, unidade: "un", valorEstimado: 18.90, aprovado: true, solicitacaoId: "1" },
+      { id: "1-2", nome: "Canetas esferográficas", quantidade: 50, unidade: "un", valorEstimado: 1.50, aprovado: true, solicitacaoId: "1" },
+      { id: "1-3", nome: "Grampeador", quantidade: 5, unidade: "un", valorEstimado: 22.50, aprovado: true, solicitacaoId: "1" }
     ],
-    projetoId: "1"
+    projetoId: "1",
+    comentarios: []
   },
   {
     id: "2",
@@ -101,12 +102,13 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     status: "pendente",
     prioridade: "alta",
     itens: [
-      { id: "2-1", nome: "Notebook Dell i7", quantidade: 3, unidade: "un", valorEstimado: 4500.00 },
-      { id: "2-2", nome: "Monitor LED 24\"", quantidade: 5, unidade: "un", valorEstimado: 950.00 },
-      { id: "2-3", nome: "Teclado sem fio", quantidade: 5, unidade: "un", valorEstimado: 120.00 },
-      { id: "2-4", nome: "Mouse sem fio", quantidade: 5, unidade: "un", valorEstimado: 65.00 }
+      { id: "2-1", nome: "Notebook Dell i7", quantidade: 3, unidade: "un", valorEstimado: 4500.00, solicitacaoId: "2" },
+      { id: "2-2", nome: "Monitor LED 24\"", quantidade: 5, unidade: "un", valorEstimado: 950.00, solicitacaoId: "2" },
+      { id: "2-3", nome: "Teclado sem fio", quantidade: 5, unidade: "un", valorEstimado: 120.00, solicitacaoId: "2" },
+      { id: "2-4", nome: "Mouse sem fio", quantidade: 5, unidade: "un", valorEstimado: 65.00, solicitacaoId: "2" }
     ],
-    projetoId: "2"
+    projetoId: "2",
+    comentarios: []
   },
   {
     id: "3",
@@ -119,14 +121,15 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     status: "parcialmente_aprovada",
     prioridade: "media",
     itens: [
-      { id: "3-1", nome: "Cimento CP II", quantidade: 50, unidade: "saco", valorEstimado: 32.90, aprovado: true },
-      { id: "3-2", nome: "Areia média", quantidade: 5, unidade: "m³", valorEstimado: 120.00, aprovado: true },
-      { id: "3-3", nome: "Tijolo 6 furos", quantidade: 2000, unidade: "un", valorEstimado: 0.75, aprovado: true },
-      { id: "3-4", nome: "Piso porcelanato 60x60", quantidade: 100, unidade: "m²", valorEstimado: 89.90, aprovado: false },
-      { id: "3-5", nome: "Porta de madeira completa", quantidade: 8, unidade: "un", valorEstimado: 450.00, aprovado: false }
+      { id: "3-1", nome: "Cimento CP II", quantidade: 50, unidade: "saco", valorEstimado: 32.90, aprovado: true, solicitacaoId: "3" },
+      { id: "3-2", nome: "Areia média", quantidade: 5, unidade: "m³", valorEstimado: 120.00, aprovado: true, solicitacaoId: "3" },
+      { id: "3-3", nome: "Tijolo 6 furos", quantidade: 2000, unidade: "un", valorEstimado: 0.75, aprovado: true, solicitacaoId: "3" },
+      { id: "3-4", nome: "Piso porcelanato 60x60", quantidade: 100, unidade: "m²", valorEstimado: 89.90, aprovado: false, solicitacaoId: "3" },
+      { id: "3-5", nome: "Porta de madeira completa", quantidade: 8, unidade: "un", valorEstimado: 450.00, aprovado: false, solicitacaoId: "3" }
     ],
     observacoes: "Aprovado apenas os itens básicos. Acabamentos serão revisados em orçamento separado.",
-    projetoId: "3"
+    projetoId: "3",
+    comentarios: []
   },
   {
     id: "4",
@@ -139,12 +142,13 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     status: "rejeitada",
     prioridade: "baixa",
     itens: [
-      { id: "4-1", nome: "Furadeira de impacto", quantidade: 2, unidade: "un", valorEstimado: 399.90, aprovado: false },
-      { id: "4-2", nome: "Jogo de chaves", quantidade: 3, unidade: "kit", valorEstimado: 189.90, aprovado: false },
-      { id: "4-3", nome: "Escada 6 degraus", quantidade: 2, unidade: "un", valorEstimado: 210.00, aprovado: false }
+      { id: "4-1", nome: "Furadeira de impacto", quantidade: 2, unidade: "un", valorEstimado: 399.90, aprovado: false, solicitacaoId: "4" },
+      { id: "4-2", nome: "Jogo de chaves", quantidade: 3, unidade: "kit", valorEstimado: 189.90, aprovado: false, solicitacaoId: "4" },
+      { id: "4-3", nome: "Escada 6 degraus", quantidade: 2, unidade: "un", valorEstimado: 210.00, aprovado: false, solicitacaoId: "4" }
     ],
     observacoes: "Solicitar com melhor detalhamento e justificativa para cada item.",
-    projetoId: "4"
+    projetoId: "4",
+    comentarios: []
   },
   {
     id: "5",
@@ -155,12 +159,13 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     status: "pendente",
     prioridade: "urgente",
     itens: [
-      { id: "5-1", nome: "Detergente multiuso", quantidade: 50, unidade: "un", valorEstimado: 8.90 },
-      { id: "5-2", nome: "Álcool 70%", quantidade: 30, unidade: "un", valorEstimado: 9.90 },
-      { id: "5-3", nome: "Papel toalha", quantidade: 100, unidade: "fardo", valorEstimado: 12.50 },
-      { id: "5-4", nome: "Desinfetante", quantidade: 40, unidade: "un", valorEstimado: 7.50 }
+      { id: "5-1", nome: "Detergente multiuso", quantidade: 50, unidade: "un", valorEstimado: 8.90, solicitacaoId: "5" },
+      { id: "5-2", nome: "Álcool 70%", quantidade: 30, unidade: "un", valorEstimado: 9.90, solicitacaoId: "5" },
+      { id: "5-3", nome: "Papel toalha", quantidade: 100, unidade: "fardo", valorEstimado: 12.50, solicitacaoId: "5" },
+      { id: "5-4", nome: "Desinfetante", quantidade: 40, unidade: "un", valorEstimado: 7.50, solicitacaoId: "5" }
     ],
-    projetoId: "5"
+    projetoId: "5",
+    comentarios: []
   }
 ];
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,8 +36,11 @@ export const NovaSolicitacaoCompra: React.FC<NovaSolicitacaoCompraProps> = ({ on
 
   const adicionarItem = () => {
     setItens([...itens, {
-      descricao: '',
+      nome: '',
       quantidade: 1,
+      unidade: 'un',
+      solicitacaoId: '', // This will be filled when the solicitation is created
+      descricao: '',
       unidadeMedida: 'un',
     }]);
   };

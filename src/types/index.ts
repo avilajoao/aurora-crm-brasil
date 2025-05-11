@@ -1,4 +1,5 @@
 
+
 export interface Usuario {
   id: string;
   nome: string;
@@ -13,6 +14,9 @@ export interface Usuario {
   salario?: number;
   nivelAcesso: string[];
   ativo: boolean;
+  avatar?: string;
+  dataCriacao?: Date;
+  ultimoAcesso?: Date;
 }
 
 export interface Notificacao {
@@ -93,6 +97,10 @@ export interface Orcamento {
   itens?: ItemOrcamento[];
   comentarios?: Comentario[];
   titulo?: string;
+  descricao?: string;
+  responsavelId?: string;
+  dataEnvio?: Date;
+  dataAprovacao?: Date;
 }
 
 export interface ItemOrcamento {
@@ -133,7 +141,7 @@ export interface Comentario {
 }
 
 export type StatusCompra = "pendente" | "parcialmente_recebida" | "recebida" | "cancelada";
-export type StatusSolicitacao = "pendente" | "aprovada" | "reprovada" | "cancelada" | "concluida" | "parcialmente_aprovada" | "rejeitada";
+export type StatusSolicitacao = "pendente" | "aprovada" | "reprovada" | "cancelada" | "concluida" | "parcialmente_aprovada" | "rejeitada" | "enviada";
 export type PrioridadeSolicitacao = "baixa" | "media" | "alta" | "urgente";
 
 export interface ItemSolicitacao {
@@ -206,14 +214,22 @@ export type StatusOrcamento = 'pendente' | 'aprovado' | 'reprovado' | 'aprovado_
 // Financial types
 export interface TransacaoFinanceira {
   id: string;
-  tipo: 'receita' | 'despesa';
+  tipo: 'receita' | 'despesa' | 'entrada' | 'saida';
   valor: number;
   dataTransacao: Date;
   descricao: string;
   categoria: string;
-  status: 'pendente' | 'concluida' | 'cancelada';
+  status: 'pendente' | 'concluida' | 'cancelada' | 'paga' | 'atrasada';
   projetoId?: string;
   arquivos?: string[];
+  referencia?: {
+    tipo: string;
+    id: string;
+    nome: string;
+  };
+  data?: Date;
+  dataPrevista?: Date;
+  dataEfetivada?: Date;
 }
 
 // Chat types
@@ -233,3 +249,4 @@ export type TipoReferencia = 'solicitacao' | 'orcamento' | 'projeto' | 'tarefa' 
 
 // Purchase request types
 export type StatusSolicitacaoCompra = StatusSolicitacao;
+

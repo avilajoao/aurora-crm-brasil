@@ -1,283 +1,196 @@
 
 import { useState } from "react";
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Image, Send, Smile, Paperclip, MoreVertical, Phone, Video } from 'lucide-react';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { Mensagem } from "@/types";
-
-// Dados de exemplo
-const contatosExemplo = [
-  { id: "1", nome: "Ana Silva", cargo: "Gerente de Projetos", online: true, ultimaMensagem: "Acabei de revisar o orçamento que você enviou" },
-  { id: "2", nome: "Carlos Mendes", cargo: "Engenheiro Civil", online: false, ultimaMensagem: "Vou precisar de mais materiais para a obra" },
-  { id: "3", nome: "Mariana Costa", cargo: "Arquiteta", online: true, ultimaMensagem: "Os desenhos estão prontos para revisão" },
-  { id: "4", nome: "Ricardo Oliveira", cargo: "Supervisor de Obras", online: true, ultimaMensagem: "A equipe já começou a preparação do terreno" },
-  { id: "5", nome: "Paulo Santos", cargo: "Eletricista", online: false, ultimaMensagem: "Instalação finalizada conforme solicitado" },
-  { id: "6", nome: "Laura Ribeiro", cargo: "Financeiro", online: true, ultimaMensagem: "Pagamento aprovado" },
-  { id: "7", nome: "Fernando Alves", cargo: "Suprimentos", online: false, ultimaMensagem: "Os materiais chegam amanhã pela manhã" },
-  { id: "8", nome: "Juliana Martins", cargo: "Cliente", online: false, ultimaMensagem: "Podemos agendar uma visita na próxima semana?" },
-];
-
-const usuarioExemplo = {
-  id: "1",
-  nome: "Usuário Exemplo",
-  email: "usuario@auroracrm.com.br",
-  cargo: "gestor",
-  departamento: "Administrativo",
-  dataCriacao: new Date("2023-01-05")
-};
-
-const anaUsuario = {
-  id: "2",
-  nome: "Ana Silva",
-  email: "ana.silva@auroracrm.com.br",
-  cargo: "gestor",
-  departamento: "Projetos",
-  dataCriacao: new Date("2023-01-10")
-};
-
-const mensagensExemplo: Mensagem[] = [
-  {
-    id: "1",
-    remetente: anaUsuario,
-    destinatario: usuarioExemplo,
-    texto: "Olá! Acabei de revisar o orçamento que você enviou para o projeto de reforma do escritório central.",
-    dataCriacao: new Date("2023-06-10T09:30:00"),
-    lida: true
-  },
-  {
-    id: "2",
-    remetente: usuarioExemplo,
-    destinatario: anaUsuario,
-    texto: "Oi Ana! Obrigado por revisar. Encontrou algum ponto que precisa ser ajustado?",
-    dataCriacao: new Date("2023-06-10T09:35:00"),
-    lida: true
-  },
-  {
-    id: "3",
-    remetente: anaUsuario,
-    destinatario: usuarioExemplo,
-    texto: "Sim, na verdade precisamos revisar os custos de material elétrico. Parece que os preços aumentaram desde a última cotação.",
-    dataCriacao: new Date("2023-06-10T09:40:00"),
-    lida: true
-  },
-  {
-    id: "4",
-    remetente: usuarioExemplo,
-    destinatario: anaUsuario,
-    texto: "Entendi. Vou solicitar novas cotações com nossos fornecedores e atualizar o orçamento ainda hoje.",
-    dataCriacao: new Date("2023-06-10T09:45:00"),
-    lida: true
-  },
-  {
-    id: "5",
-    remetente: anaUsuario,
-    destinatario: usuarioExemplo,
-    texto: "Perfeito! Assim que tiver a versão atualizada, podemos agendar uma reunião com o cliente para apresentação.",
-    dataCriacao: new Date("2023-06-10T09:50:00"),
-    lida: true
-  },
-  {
-    id: "6",
-    remetente: anaUsuario,
-    destinatario: usuarioExemplo,
-    texto: "Também precisamos revisar o cronograma de execução, pois o cliente solicitou que a obra seja finalizada uma semana antes do previsto inicialmente.",
-    dataCriacao: new Date("2023-06-10T09:52:00"),
-    lida: true
-  },
-  {
-    id: "7",
-    remetente: usuarioExemplo,
-    destinatario: anaUsuario,
-    texto: "Vou verificar com a equipe de execução se conseguimos antecipar a conclusão. Isso pode implicar em custos adicionais com horas extras. Devo incluir essa possibilidade no orçamento revisado?",
-    dataCriacao: new Date("2023-06-10T10:00:00"),
-    lida: true
-  }
-];
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAuth } from '@/contexts/AuthContext';
+import { Send, PaperclipIcon, ImagePlus } from 'lucide-react';
+import { Mensagem } from '@/types';
+import { format } from 'date-fns';
 
 export function ChatPage() {
-  const [contatos] = useState(contatosExemplo);
-  const [mensagens] = useState<Mensagem[]>(mensagensExemplo);
-  const [contatoSelecionado, setContatoSelecionado] = useState(contatosExemplo[0]);
-  const [novaMensagem, setNovaMensagem] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [message, setMessage] = useState("");
+  const { currentUser } = useAuth();
+  const [chatMessages, setChatMessages] = useState<Mensagem[]>([
+    {
+      id: "1",
+      texto: "Olá, como posso ajudar com o projeto?",
+      remetenteId: "2",
+      destinatarioId: "1",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+      lida: true
+    },
+    {
+      id: "2",
+      texto: "Precisamos revisar o cronograma da obra.",
+      remetenteId: "1",
+      destinatarioId: "2",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1.5),
+      lida: true
+    },
+    {
+      id: "3",
+      texto: "Claro! Podemos marcar uma reunião para amanhã às 10h?",
+      remetenteId: "2",
+      destinatarioId: "1",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 60 * 24),
+      lida: true
+    },
+    {
+      id: "4",
+      texto: "Perfeito. Vou preparar os documentos necessários.",
+      remetenteId: "1",
+      destinatarioId: "2",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 60 * 23),
+      lida: true
+    },
+    {
+      id: "5",
+      texto: "Você pode enviar o relatório de progresso também?",
+      remetenteId: "2",
+      destinatarioId: "1",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      lida: true
+    },
+    {
+      id: "6",
+      texto: "Já estou finalizando e envio até o fim do dia.",
+      remetenteId: "1",
+      destinatarioId: "2",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 30),
+      lida: true
+    },
+    {
+      id: "7",
+      texto: "Ótimo! Aguardo o documento para revisarmos na reunião.",
+      remetenteId: "2",
+      destinatarioId: "1",
+      dataCriacao: new Date(Date.now() - 1000 * 60 * 15),
+      lida: false
+    }
+  ]);
 
-  const filteredContatos = contatos.filter((contato) =>
-    contato.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSendMessage = () => {
+    if (message.trim() === "") return;
 
-  const handleEnviarMensagem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!novaMensagem.trim()) return;
-    
-    // Aqui seria o envio da mensagem para o backend
-    console.log("Mensagem enviada:", novaMensagem);
-    
-    // Limpa o campo após enviar
-    setNovaMensagem("");
+    const newMessage: Mensagem = {
+      id: (chatMessages.length + 1).toString(),
+      texto: message,
+      remetenteId: currentUser?.id || "1",
+      destinatarioId: "2", // ID fixo para o exemplo
+      dataCriacao: new Date(),
+      lida: false
+    };
+
+    setChatMessages([...chatMessages, newMessage]);
+    setMessage("");
   };
 
-  const formatarHora = (data: Date) => {
-    return new Date(data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const formatMessageDate = (date: Date) => {
+    const now = new Date();
+    const messageDate = new Date(date);
+    
+    // Se a mensagem for de hoje, mostra apenas a hora
+    if (messageDate.toDateString() === now.toDateString()) {
+      return format(messageDate, 'HH:mm');
+    }
+    // Se a mensagem for de ontem, mostra "Ontem" e a hora
+    else if (
+      messageDate.getDate() === now.getDate() - 1 &&
+      messageDate.getMonth() === now.getMonth() &&
+      messageDate.getFullYear() === now.getFullYear()
+    ) {
+      return `Ontem ${format(messageDate, 'HH:mm')}`;
+    }
+    // Caso contrário, mostra a data completa
+    else {
+      return format(messageDate, 'dd/MM/yyyy HH:mm');
+    }
   };
 
   return (
     <AppLayout>
-      <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
-        {/* Lista de contatos */}
-        <div className="w-80 border-r flex flex-col md:block hidden">
-          <div className="p-4 border-b">
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar contatos..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      <div className="container max-w-6xl h-[calc(100vh-70px)] py-4 flex flex-col">
+        <div className="mb-4 pb-4 border-b">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src="/avatars/joao.png" alt="João" />
+              <AvatarFallback>JS</AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="font-semibold">João Silva</h2>
+              <p className="text-sm text-muted-foreground">Gestor de Projetos • Online</p>
             </div>
           </div>
-          <ScrollArea className="flex-1">
-            {filteredContatos.map((contato) => (
+        </div>
+
+        <ScrollArea className="flex-grow pr-4 mb-4">
+          <div className="flex flex-col gap-4">
+            {chatMessages.map((msg) => (
               <div
-                key={contato.id}
-                className={cn(
-                  "p-3 cursor-pointer hover:bg-muted/50",
-                  contatoSelecionado.id === contato.id && "bg-muted"
-                )}
-                onClick={() => setContatoSelecionado(contato)}
+                key={msg.id}
+                className={`flex gap-2 ${msg.remetenteId === (currentUser?.id || "1") ? "flex-row-reverse" : ""}`}
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar>
-                      <AvatarImage src={`/avatars/${contato.id}.png`} alt={contato.nome} />
-                      <AvatarFallback>{contato.nome.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {contato.online && (
-                      <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-1 ring-white"></span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-medium text-sm truncate">{contato.nome}</h4>
-                      <span className="text-xs text-muted-foreground">09:50</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">{contato.cargo}</p>
-                    <p className="text-xs truncate">{contato.ultimaMensagem}</p>
-                  </div>
+                <Avatar className="h-8 w-8 mt-1">
+                  <AvatarImage
+                    src={msg.remetenteId === (currentUser?.id || "1") ? "/avatars/admin.png" : "/avatars/joao.png"}
+                    alt={msg.remetenteId === (currentUser?.id || "1") ? "Você" : "João"}
+                  />
+                  <AvatarFallback>{msg.remetenteId === (currentUser?.id || "1") ? "ME" : "JS"}</AvatarFallback>
+                </Avatar>
+                <div
+                  className={`max-w-[75%] rounded-lg px-4 py-2 ${
+                    msg.remetenteId === (currentUser?.id || "1")
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary"
+                  }`}
+                >
+                  <p>{msg.texto}</p>
+                  <p className={`text-xs mt-1 ${
+                    msg.remetenteId === (currentUser?.id || "1")
+                      ? "text-primary-foreground/80"
+                      : "text-muted-foreground"
+                  }`}>
+                    {formatMessageDate(msg.dataCriacao)}
+                  </p>
                 </div>
               </div>
             ))}
-          </ScrollArea>
-        </div>
-
-        {/* Área de chat */}
-        <div className="flex-1 flex flex-col">
-          {/* Cabeçalho do chat */}
-          <div className="p-4 border-b flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={`/avatars/${contatoSelecionado.id}.png`} alt={contatoSelecionado.nome} />
-                <AvatarFallback>{contatoSelecionado.nome.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{contatoSelecionado.nome}</h3>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <span className={cn(
-                    "inline-block h-2 w-2 rounded-full mr-1",
-                    contatoSelecionado.online ? "bg-green-500" : "bg-gray-400"
-                  )}></span>
-                  {contatoSelecionado.online ? "Online" : "Offline"}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="icon">
-                <Phone className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Video className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
+        </ScrollArea>
 
-          {/* Área de mensagens */}
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              <div className="text-center">
-                <span className="text-xs bg-muted px-2 py-1 rounded-full">Hoje</span>
-              </div>
-              
-              {mensagens.map((mensagem) => {
-                const isCurrentUser = mensagem.remetente.id === "1";
-                
-                return (
-                  <div 
-                    key={mensagem.id} 
-                    className={cn(
-                      "flex",
-                      isCurrentUser ? "justify-end" : "justify-start"
-                    )}
-                  >
-                    <div className="flex gap-2 max-w-[70%]">
-                      {!isCurrentUser && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={`/avatars/${mensagem.remetente.id}.png`} alt={mensagem.remetente.nome} />
-                          <AvatarFallback>{mensagem.remetente.nome.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                      )}
-                      <div>
-                        <div 
-                          className={cn(
-                            "rounded-lg p-3",
-                            isCurrentUser 
-                              ? "bg-primary text-primary-foreground" 
-                              : "bg-muted"
-                          )}
-                        >
-                          {mensagem.texto}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1 px-1">
-                          {formatarHora(mensagem.dataCriacao)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
-
-          {/* Área de digitação */}
-          <div className="p-4 border-t">
-            <form onSubmit={handleEnviarMensagem} className="flex gap-2">
-              <Button type="button" variant="ghost" size="icon">
-                <Smile className="h-4 w-4" />
+        <div className="pt-2 border-t">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="flex items-end gap-2"
+          >
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Digite sua mensagem..."
+              className="min-h-[80px]"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+            />
+            <div className="flex flex-col gap-2">
+              <Button type="button" size="icon" variant="outline">
+                <ImagePlus className="h-4 w-4" />
               </Button>
-              <Button type="button" variant="ghost" size="icon">
-                <Paperclip className="h-4 w-4" />
-              </Button>
-              <Button type="button" variant="ghost" size="icon">
-                <Image className="h-4 w-4" />
-              </Button>
-              <Input 
-                placeholder="Digite uma mensagem..." 
-                className="flex-1"
-                value={novaMensagem}
-                onChange={(e) => setNovaMensagem(e.target.value)}
-              />
-              <Button type="submit">
+              <Button type="submit" size="icon" disabled={message.trim() === ""}>
                 <Send className="h-4 w-4" />
               </Button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </AppLayout>
