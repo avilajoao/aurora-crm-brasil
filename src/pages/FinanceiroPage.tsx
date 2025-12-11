@@ -38,6 +38,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Fornecedor",
     descricao: "Pagamento Fornecedor Aço",
     valor: 12500,
+    dataTransacao: new Date("2023-06-14"),
     data: new Date("2023-06-14"),
     dataPrevista: new Date("2023-06-15"),
     dataEfetivada: new Date("2023-06-14"),
@@ -54,6 +55,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Pagamento Projeto Reforma Escritório",
     valor: 45000,
+    dataTransacao: new Date("2023-06-20"),
     data: new Date("2023-06-20"),
     dataPrevista: new Date("2023-06-20"),
     dataEfetivada: new Date("2023-06-20"),
@@ -70,6 +72,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Funcionário",
     descricao: "Folha de Pagamento Junho",
     valor: 35000,
+    dataTransacao: new Date("2023-06-30"),
     data: new Date("2023-06-30"),
     dataPrevista: new Date("2023-06-30"),
     status: "pendente",
@@ -85,6 +88,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Fornecedor",
     descricao: "Pagamento Fornecedor Material Elétrico",
     valor: 4800,
+    dataTransacao: new Date("2023-06-11"),
     data: new Date("2023-06-11"),
     dataPrevista: new Date("2023-06-10"),
     dataEfetivada: new Date("2023-06-11"),
@@ -101,6 +105,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Adiantamento Projeto Galpão Industrial",
     valor: 120000,
+    dataTransacao: new Date("2023-06-25"),
     data: new Date("2023-06-25"),
     dataPrevista: new Date("2023-06-25"),
     status: "pendente",
@@ -116,6 +121,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Operacional",
     descricao: "Aluguel Equipamentos",
     valor: 7500,
+    dataTransacao: new Date("2023-06-05"),
     data: new Date("2023-06-05"),
     dataPrevista: new Date("2023-06-05"),
     dataEfetivada: new Date("2023-06-05"),
@@ -132,6 +138,7 @@ const transacoesExemplo: TransacaoFinanceira[] = [
     categoria: "Cliente",
     descricao: "Pagamento Final Projeto Elétrico",
     valor: 18500,
+    dataTransacao: new Date("2023-06-18"),
     data: new Date("2023-06-18"),
     dataPrevista: new Date("2023-06-18"),
     status: "atrasada",
@@ -189,16 +196,17 @@ export function FinanceiroPage() {
     return new Date(data).toLocaleDateString('pt-BR');
   };
 
-  const getStatusLabel = (status: 'pendente' | 'paga' | 'atrasada' | 'cancelada') => {
+  const getStatusLabel = (status: 'pendente' | 'paga' | 'atrasada' | 'cancelada' | 'concluida') => {
     switch (status) {
       case 'pendente': return (
         <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
           Pendente
         </Badge>
       );
-      case 'paga': return (
+      case 'paga': 
+      case 'concluida': return (
         <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-          Paga
+          {status === 'concluida' ? 'Concluída' : 'Paga'}
         </Badge>
       );
       case 'atrasada': return (

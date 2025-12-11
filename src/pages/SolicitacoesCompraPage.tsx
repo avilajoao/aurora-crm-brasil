@@ -85,6 +85,7 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     dataAprovacao: new Date("2023-06-12"),
     status: "aprovada",
     prioridade: "media",
+    urgente: false,
     itens: [
       { id: "1-1", nome: "Resma de papel A4", quantidade: 20, unidade: "un", valorEstimado: 18.90, aprovado: true, solicitacaoId: "1" },
       { id: "1-2", nome: "Canetas esferográficas", quantidade: 50, unidade: "un", valorEstimado: 1.50, aprovado: true, solicitacaoId: "1" },
@@ -101,6 +102,7 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     dataSolicitacao: new Date("2023-06-15"),
     status: "pendente",
     prioridade: "alta",
+    urgente: false,
     itens: [
       { id: "2-1", nome: "Notebook Dell i7", quantidade: 3, unidade: "un", valorEstimado: 4500.00, solicitacaoId: "2" },
       { id: "2-2", nome: "Monitor LED 24\"", quantidade: 5, unidade: "un", valorEstimado: 950.00, solicitacaoId: "2" },
@@ -120,6 +122,7 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     dataAprovacao: new Date("2023-06-08"),
     status: "parcialmente_aprovada",
     prioridade: "media",
+    urgente: false,
     itens: [
       { id: "3-1", nome: "Cimento CP II", quantidade: 50, unidade: "saco", valorEstimado: 32.90, aprovado: true, solicitacaoId: "3" },
       { id: "3-2", nome: "Areia média", quantidade: 5, unidade: "m³", valorEstimado: 120.00, aprovado: true, solicitacaoId: "3" },
@@ -141,6 +144,7 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     dataAprovacao: new Date("2023-06-01"),
     status: "rejeitada",
     prioridade: "baixa",
+    urgente: false,
     itens: [
       { id: "4-1", nome: "Furadeira de impacto", quantidade: 2, unidade: "un", valorEstimado: 399.90, aprovado: false, solicitacaoId: "4" },
       { id: "4-2", nome: "Jogo de chaves", quantidade: 3, unidade: "kit", valorEstimado: 189.90, aprovado: false, solicitacaoId: "4" },
@@ -158,6 +162,7 @@ const solicitacoesMock: SolicitacaoCompra[] = [
     dataSolicitacao: new Date("2023-06-18"),
     status: "pendente",
     prioridade: "urgente",
+    urgente: true,
     itens: [
       { id: "5-1", nome: "Detergente multiuso", quantidade: 50, unidade: "un", valorEstimado: 8.90, solicitacaoId: "5" },
       { id: "5-2", nome: "Álcool 70%", quantidade: 30, unidade: "un", valorEstimado: 9.90, solicitacaoId: "5" },
@@ -213,7 +218,9 @@ export function SolicitacoesCompraPage() {
       status: "pendente",
       prioridade: solicitacao.prioridade as "baixa" | "media" | "alta" | "urgente",
       itens: solicitacao.itens || [],
-      projetoId: solicitacao.projetoId
+      projetoId: solicitacao.projetoId,
+      urgente: solicitacao.prioridade === "urgente",
+      comentarios: []
     };
     
     setSolicitacoes([...solicitacoes, novaSolic]);

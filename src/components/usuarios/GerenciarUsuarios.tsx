@@ -45,6 +45,8 @@ const usuariosExemplo: User[] = [
     avatar: '/avatars/admin.png',
     departamento: 'Administração',
     ultimoAcesso: new Date(),
+    nivelAcesso: ['admin'],
+    ativo: true,
   },
   {
     id: '2',
@@ -55,6 +57,8 @@ const usuariosExemplo: User[] = [
     avatar: '/avatars/joao.png',
     departamento: 'Gerência',
     ultimoAcesso: new Date(2024, 3, 10),
+    nivelAcesso: ['gestor'],
+    ativo: true,
   },
   {
     id: '3',
@@ -65,6 +69,8 @@ const usuariosExemplo: User[] = [
     avatar: '/avatars/maria.png',
     departamento: 'Supervisão',
     ultimoAcesso: new Date(2024, 3, 12),
+    nivelAcesso: ['supervisor'],
+    ativo: true,
   },
   {
     id: '4',
@@ -75,6 +81,8 @@ const usuariosExemplo: User[] = [
     avatar: '/avatars/carlos.png',
     departamento: 'Operações',
     ultimoAcesso: new Date(2024, 3, 15),
+    nivelAcesso: ['operador'],
+    ativo: true,
   },
 ];
 
@@ -142,6 +150,8 @@ export const GerenciarUsuarios = () => {
       dataCriacao: new Date(),
       ultimoAcesso: new Date(),
       avatar: '/avatars/default.png',
+      nivelAcesso: [novoUsuario.cargo as string],
+      ativo: true,
     };
 
     setUsuarios([...usuarios, newUser]);

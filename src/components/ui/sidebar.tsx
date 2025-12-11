@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 import { cn } from "@/lib/utils";
+import { X, Menu } from "lucide-react";
 
 interface SidebarContextProps {
   isOpen: boolean;
@@ -44,14 +45,24 @@ export function Sidebar({ className, isOpen, onToggle, ...props }: SidebarProps)
   const isVisible = isOpen !== undefined ? isOpen : sidebarContext?.isOpen;
 
   return (
-    <aside
-      className={cn(
-        "fixed inset-y-0 left-0 z-40 flex flex-col border-r bg-background transition-transform duration-300 md:relative",
-        isVisible ? "translate-x-0" : "-translate-x-full md:translate-x-0",
-        className
+    <>
+      {/* Overlay for mobile */}
+      {isVisible && (
+        <div 
+          className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={onToggle}
+        />
       )}
-      {...props}
-    />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r bg-background transition-transform duration-300 ease-in-out md:relative md:w-64",
+          isVisible ? "translate-x-0" : "-translate-x-full",
+          "md:translate-x-0",
+          className
+        )}
+        {...props}
+      />
+    </>
   );
 }
 
@@ -96,7 +107,6 @@ export function SidebarFooter({
 
 export function SidebarTrigger({
   className,
-  children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { isOpen, setIsOpen } = useSidebar();
@@ -104,11 +114,15 @@ export function SidebarTrigger({
   return (
     <button
       type="button"
-      className={cn("md:hidden", className)}
+      className={cn(
+        "inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring",
+        className
+      )}
       onClick={() => setIsOpen(!isOpen)}
       {...props}
     >
-      {children || <span className="sr-only">Toggle Sidebar</span>}
+      {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      <span className="sr-only">Toggle Sidebar</span>
     </button>
   );
 }
@@ -167,7 +181,7 @@ export function SidebarMenuButton({
     <button
       type="button"
       className={cn(
-        "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
         className
       )}
       {...props}
