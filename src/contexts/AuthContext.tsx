@@ -26,6 +26,8 @@ const defaultUser: User = {
   departamento: 'Administração',
   telefone: '(11) 99999-9999',
   ultimoAcesso: new Date(),
+  nivelAcesso: ['admin'],
+  ativo: true,
 };
 
 // Permission map based on user roles

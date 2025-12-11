@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { NotificacoesDialog } from './NotificacoesDialog';
 import { ThemeToggle } from './ThemeToggle';
+import { MobileBottomNav } from './MobileBottomNav';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -39,36 +40,42 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
-      <div className="flex flex-col flex-1">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background px-4 h-14">
+      <div className="flex flex-col flex-1 min-w-0">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background px-3 sm:px-4 h-14">
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden shrink-0"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Alternar navegação</span>
           </Button>
-          <div className="flex items-center gap-2">
+          
+          <div className="flex-1 md:hidden" />
+          
+          <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle />
             <NotificacoesDialog />
             
             {currentUser && (
-              <div className="flex items-center gap-2 pl-2 text-sm">
+              <div className="flex items-center gap-2 pl-1 sm:pl-2 text-sm">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={currentUser.avatar} alt={currentUser.nome} />
                   <AvatarFallback>{currentUser.nome[0]}</AvatarFallback>
                 </Avatar>
-                <div className="hidden md:block">
-                  <div className="font-medium">{currentUser.nome}</div>
+                <div className="hidden sm:block">
+                  <div className="font-medium text-sm">{currentUser.nome}</div>
                   <div className="text-xs text-muted-foreground">{currentUser.cargo}</div>
                 </div>
               </div>
             )}
           </div>
         </header>
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto pb-16 md:pb-0">{children}</main>
+        
+        {/* Mobile bottom navigation */}
+        {isMobile && <MobileBottomNav />}
       </div>
     </div>
   );
