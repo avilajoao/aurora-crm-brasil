@@ -13,10 +13,10 @@ export const tarefasExemplo = [
       nome: "Ana Silva",
       avatar: "/avatars/ana.png"
     },
-    dataCriacao: new Date("2023-05-10"),
-    dataInicio: new Date("2023-05-12"),
-    dataVencimento: new Date("2023-05-15"),
-    dataConclusao: new Date("2023-05-14"),
+    dataCriacao: new Date("2026-01-10"),
+    dataInicio: new Date("2026-01-12"),
+    dataVencimento: new Date("2026-01-15"),
+    dataConclusao: new Date("2026-01-14"),
     comentarios: []
   },
   {
@@ -31,9 +31,9 @@ export const tarefasExemplo = [
       nome: "Carlos Mendes",
       avatar: "/avatars/carlos.png"
     },
-    dataCriacao: new Date("2023-05-15"),
-    dataInicio: new Date("2023-05-16"),
-    dataVencimento: new Date("2023-05-22"),
+    dataCriacao: new Date("2026-01-20"),
+    dataInicio: new Date("2026-01-22"),
+    dataVencimento: new Date("2026-02-10"),
     comentarios: []
   },
   {
@@ -48,8 +48,8 @@ export const tarefasExemplo = [
       nome: "Mariana Costa",
       avatar: "/avatars/mariana.png"
     },
-    dataCriacao: new Date("2023-05-17"),
-    dataVencimento: new Date("2023-05-25"),
+    dataCriacao: new Date("2026-01-25"),
+    dataVencimento: new Date("2026-02-15"),
     comentarios: []
   },
   {
@@ -64,8 +64,8 @@ export const tarefasExemplo = [
       nome: "Lucas Ferreira",
       avatar: "/avatars/lucas.png"
     },
-    dataCriacao: new Date("2023-05-12"),
-    dataVencimento: new Date("2023-05-20"),
+    dataCriacao: new Date("2026-01-28"),
+    dataVencimento: new Date("2026-02-20"),
     comentarios: []
   },
   {
@@ -80,9 +80,9 @@ export const tarefasExemplo = [
       nome: "Paulo Santos",
       avatar: "/avatars/paulo.png"
     },
-    dataCriacao: new Date("2023-05-10"),
-    dataInicio: new Date("2023-05-11"),
-    dataVencimento: new Date("2023-05-18"),
+    dataCriacao: new Date("2026-01-30"),
+    dataInicio: new Date("2026-02-01"),
+    dataVencimento: new Date("2026-02-08"),
     comentarios: []
   },
   {
@@ -97,8 +97,8 @@ export const tarefasExemplo = [
       nome: "Ana Silva",
       avatar: "/avatars/ana.png"
     },
-    dataCriacao: new Date("2023-05-18"),
-    dataVencimento: new Date("2023-05-22"),
+    dataCriacao: new Date("2026-02-01"),
+    dataVencimento: new Date("2026-02-07"),
     comentarios: []
   }
 ];

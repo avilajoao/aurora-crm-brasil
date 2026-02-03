@@ -20,7 +20,7 @@ export const projectsData: Projeto[] = [
     responsavel: 'Ana Silva',
     valor: 85000,
     status: 'em_andamento',
-    dataPrevista: '15/06/2023',
+    dataPrevista: '15/03/2026',
     descricao: 'Projeto de reforma completa do escritório central com substituição de mobiliário e adequações estruturais.'
   },
   {
@@ -30,7 +30,7 @@ export const projectsData: Projeto[] = [
     responsavel: 'Carlos Mendes',
     valor: 420000,
     status: 'aguardando_aprovacao',
-    dataPrevista: '30/10/2023',
+    dataPrevista: '30/06/2026',
     descricao: 'Construção de galpão industrial com 1.200m² incluindo área administrativa e estacionamento.'
   },
   {
@@ -40,7 +40,7 @@ export const projectsData: Projeto[] = [
     responsavel: 'Mariana Costa',
     valor: 38500,
     status: 'concluido',
-    dataPrevista: '22/04/2023',
+    dataPrevista: '22/01/2026',
     descricao: 'Revisão e modernização de toda a instalação elétrica do condomínio, incluindo áreas comuns.'
   },
   {
@@ -50,7 +50,7 @@ export const projectsData: Projeto[] = [
     responsavel: 'Ricardo Oliveira',
     valor: 650000,
     status: 'em_analise',
-    dataPrevista: '10/12/2023',
+    dataPrevista: '10/08/2026',
     descricao: 'Projeto de ampliação da fábrica de alimentos com construção de novas linhas de produção.'
   },
   {
@@ -60,7 +60,7 @@ export const projectsData: Projeto[] = [
     responsavel: 'Paulo Santos',
     valor: 22000,
     status: 'em_andamento',
-    dataPrevista: '05/05/2023',
+    dataPrevista: '28/02/2026',
     descricao: 'Manutenção preventiva em todo o maquinário da linha de produção principal.'
   },
 ];

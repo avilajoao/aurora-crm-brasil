@@ -12,7 +12,7 @@ const projectsData = [
     responsavel: 'Ana Silva',
     valor: 85000,
     status: 'em_andamento',
-    dataPrevista: '15/06/2023'
+    dataPrevista: '15/03/2026'
   },
   {
     id: '2',
@@ -21,7 +21,7 @@ const projectsData = [
     responsavel: 'Carlos Mendes',
     valor: 420000,
     status: 'aguardando_aprovacao',
-    dataPrevista: '30/10/2023'
+    dataPrevista: '30/06/2026'
   },
   {
     id: '3',
@@ -30,7 +30,7 @@ const projectsData = [
     responsavel: 'Mariana Costa',
     valor: 38500,
     status: 'concluido',
-    dataPrevista: '22/04/2023'
+    dataPrevista: '22/01/2026'
   },
   {
     id: '4',
@@ -39,7 +39,7 @@ const projectsData = [
     responsavel: 'Ricardo Oliveira',
     valor: 650000,
     status: 'em_analise',
-    dataPrevista: '10/12/2023'
+    dataPrevista: '10/08/2026'
   },
   {
     id: '5',
@@ -48,7 +48,7 @@ const projectsData = [
     responsavel: 'Paulo Santos',
     valor: 22000,
     status: 'em_andamento',
-    dataPrevista: '05/05/2023'
+    dataPrevista: '28/02/2026'
   },
 ];
 
